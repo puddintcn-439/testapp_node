@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Users CRUD</title>
+    <style>
+      body { font-family: Arial, sans-serif; padding: 20px; }
+      table { border-collapse: collapse; width: 100%; margin-top: 10px }
+      th, td { border: 1px solid #ddd; padding: 8px }
+      th { background: #f4f4f4 }
+    </style>
+  </head>
+  <body>
+    <h1>Users</h1>
+
+    <form id="userForm">
+      <input type="hidden" id="userId" />
+      <input id="name" placeholder="Name" required />
+      <input id="email" placeholder="Email" required />
+      <button type="submit">Save</button>
+      <button type="button" id="cancelBtn">Cancel</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Name</th><th>Email</th><th>Actions</th></tr>
+      </thead>
+      <tbody id="users"></tbody>
+    </table>
+
+    <script>
+      const $ = (s) => document.querySelector(s);
+      const usersTbody = document.getElementById('users');
+      const form = document.getElementById('userForm');
+      const userId = document.getElementById('userId');
+      const nameInput = document.getElementById('name');
+      const emailInput = document.getElementById('email');
+      const cancelBtn = document.getElementById('cancelBtn');
+
+      async function fetchUsers() {
+        const res = await fetch('/api/users');
+        const users = await res.json();
+        usersTbody.innerHTML = users.map(u => `
+          <tr>
+            <td>${u.id}</td>
+            <td>${u.name}</td>
+            <td>${u.email}</td>
+            <td>
+              <button data-id="${u.id}" class="edit">Edit</button>
+              <button data-id="${u.id}" class="del">Delete</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = userId.value;
+        const payload = { name: nameInput.value, email: emailInput.value };
+        if (id) {
+          await fetch('/api/users/' + id, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        } else {
+          await fetch('/api/users', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        }
+        resetForm();
+        fetchUsers();
+      });
+
+      cancelBtn.addEventListener('click', (e)=>{ e.preventDefault(); resetForm(); });
+
+      usersTbody.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('edit')) {
+          const id = e.target.dataset.id;
+          const res = await fetch('/api/users/' + id);
+          const u = await res.json();
+          userId.value = u.id;
+          nameInput.value = u.name;
+          emailInput.value = u.email;
+        }
+        if (e.target.classList.contains('del')) {
+          const id = e.target.dataset.id;
+          if (confirm('Delete user #' + id + '?')) {
+            await fetch('/api/users/' + id, { method: 'DELETE' });
+            fetchUsers();
+          }
+        }
+      });
+
+      function resetForm(){ userId.value=''; nameInput.value=''; emailInput.value=''; }
+
+      fetchUsers();
+    </script>
+  </body>
+</html>
