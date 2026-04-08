@@ -8,22 +8,30 @@ import { swaggerSpec } from "./config/swagger";
 import userRoutes from "./routes/userRoutes";
 
 const app = express();
-app.use(cors({ origin: "http://localhost:5173" }));
+
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",")
+  : ["http://localhost:5173"];
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "..", "public")));
 
 app.use("/api/users", userRoutes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+export { app, initDb };
 
-initDb()
-  .then(() => {
-    app.listen(port, () =>
-      console.log(`Server running at http://localhost:${port}`)
-    );
-  })
-  .catch((err) => {
-    console.error("DB init failed:", err.message || err);
-    process.exit(1);
-  });
+// Only start the HTTP server when running locally (not on Vercel)
+if (!process.env.VERCEL) {
+  const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+  initDb()
+    .then(() => {
+      app.listen(port, () =>
+        console.log(`Server running at http://localhost:${port}`)
+      );
+    })
+    .catch((err) => {
+      console.error("DB init failed:", err.message || err);
+      process.exit(1);
+    });
+}

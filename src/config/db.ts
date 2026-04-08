@@ -1,7 +1,7 @@
 import { Pool as PgPool } from "pg";
 import * as mssql from "mssql";
 
-export const DB_TYPE = (process.env.DB_TYPE || "mssql").toLowerCase();
+export const DB_TYPE = (process.env.DB_TYPE || "pg").toLowerCase();
 
 export let pgPool: PgPool | null = null;
 export let mssqlPool: mssql.ConnectionPool | null = null;
