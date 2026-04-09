@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { User } from "../types/user";
 
 interface Props {
@@ -11,6 +11,11 @@ export default function UserForm({ editing, onSave, onCancel }: Props) {
   const [name, setName] = useState(editing?.name ?? "");
   const [email, setEmail] = useState(editing?.email ?? "");
 
+  useEffect(() => {
+    setName(editing?.name ?? "");
+    setEmail(editing?.email ?? "");
+  }, [editing]);
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim() || !email.trim()) return;
@@ -20,27 +25,30 @@ export default function UserForm({ editing, onSave, onCancel }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: 16 }}>
+    <form onSubmit={handleSubmit} className="user-form">
       <input
+        className=""
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Name"
         required
-        style={{ marginRight: 8 }}
       />
       <input
+        className=""
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Email"
         required
-        style={{ marginRight: 8 }}
       />
-      <button type="submit">{editing ? "Update" : "Add"}</button>
-      {editing && (
-        <button type="button" onClick={onCancel} style={{ marginLeft: 8 }}>
-          Cancel
-        </button>
-      )}
+
+      <div style={{ display: "flex", gap: 8 }}>
+        <button className="btn btn-primary" type="submit">{editing ? "Update" : "Add"}</button>
+        {editing && (
+          <button className="btn btn-ghost" type="button" onClick={onCancel}>
+            Cancel
+          </button>
+        )}
+      </div>
     </form>
   );
 }

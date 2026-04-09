@@ -46,20 +46,26 @@ export default function App() {
   }
 
   return (
-    <div style={{ fontFamily: "Arial, sans-serif", padding: 20 }}>
-      <h1>Users</h1>
-      {error && (
-        <p style={{ color: "red" }}>
-          {error}{" "}
-          <button onClick={() => setError(null)}>Dismiss</button>
-        </p>
-      )}
-      <UserForm
-        editing={editing}
-        onSave={handleSave}
-        onCancel={() => setEditing(null)}
-      />
-      <UserTable users={users} onEdit={setEditing} onDelete={handleDelete} />
+    <div className="app">
+      <div className="card">
+        <h1 className="header">Users</h1>
+        {error && (
+          <div className="error">
+            <span>{error}</span>
+            <button className="btn btn-ghost" onClick={() => setError(null)}>Dismiss</button>
+          </div>
+        )}
+
+        <div style={{ height: 12 }} />
+
+        <UserForm
+          editing={editing}
+          onSave={handleSave}
+          onCancel={() => setEditing(null)}
+        />
+
+        <UserTable users={users} onEdit={setEditing} onDelete={handleDelete} />
+      </div>
     </div>
   );
 }

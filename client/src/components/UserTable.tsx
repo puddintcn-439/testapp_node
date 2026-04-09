@@ -8,30 +8,30 @@ interface Props {
 
 export default function UserTable({ users, onEdit, onDelete }: Props) {
   if (users.length === 0) {
-    return <p>No users found.</p>;
+    return <p className="muted">No users found.</p>;
   }
 
   return (
-    <table style={{ borderCollapse: "collapse", width: "100%" }}>
+    <table className="table">
       <thead>
-        <tr style={{ background: "#f4f4f4" }}>
-          <th style={th}>ID</th>
-          <th style={th}>Name</th>
-          <th style={th}>Email</th>
-          <th style={th}>Actions</th>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         {users.map((u) => (
           <tr key={u.id}>
-            <td style={td}>{u.id}</td>
-            <td style={td}>{u.name}</td>
-            <td style={td}>{u.email}</td>
-            <td style={td}>
-              <button onClick={() => onEdit(u)} style={{ marginRight: 8 }}>
+            <td>{u.id}</td>
+            <td>{u.name}</td>
+            <td>{u.email}</td>
+            <td>
+              <button className="btn btn-ghost" onClick={() => onEdit(u)} style={{ marginRight: 8 }}>
                 Edit
               </button>
-              <button onClick={() => onDelete(u.id)}>Delete</button>
+              <button className="btn" onClick={() => onDelete(u.id)}>Delete</button>
             </td>
           </tr>
         ))}
@@ -40,13 +40,4 @@ export default function UserTable({ users, onEdit, onDelete }: Props) {
   );
 }
 
-const th: React.CSSProperties = {
-  border: "1px solid #ddd",
-  padding: "8px",
-  textAlign: "left",
-};
-
-const td: React.CSSProperties = {
-  border: "1px solid #ddd",
-  padding: "8px",
-};
+// styles moved to index.css
