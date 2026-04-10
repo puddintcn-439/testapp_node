@@ -8,7 +8,8 @@
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
     "dev:client": "npm run dev --prefix client",
-    "dev:all": "concurrently \"npm run dev\" \"npm run dev:client\""
+    "dev:all": "concurrently \"npm run dev\" \"npm run dev:client\"",
+    "postinstall": "npm --prefix client install"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +27,7 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.5.0"
   },
+  
   "dependencies": {
     "cors": "^2.8.6",
     "dotenv": "^17.4.0",
