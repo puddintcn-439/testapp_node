@@ -3,10 +3,126 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TestApp</title>
+    <title>User Manager — Landing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/landing.css">
   </head>
   <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="logo" href="#">UserManager</a>
+        <nav class="nav">
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#contact">Contact</a>
+          <a class="btn btn-ghost" href="#signup">Get Started</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container hero-inner">
+          <div class="hero-copy">
+            <h1>Manage users effortlessly</h1>
+            <p class="lead">A modern, secure dashboard to add, edit and report on users — built for teams that move fast.</p>
+            <div class="hero-cta">
+              <a class="btn btn-primary" href="#signup">Start free</a>
+              <a class="btn btn-outline" href="#features">Learn more</a>
+            </div>
+          </div>
+          <div class="hero-media">
+            <div class="card mock">
+              <div class="card-header">Users</div>
+              <div class="card-body">
+                <ul class="user-list">
+                  <li>Alice Johnson — Admin</li>
+                  <li>David Lee — Editor</li>
+                  <li>Maria Gomez — Viewer</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" class="features container">
+        <h2 class="section-title">Powerful features for every team</h2>
+        <div class="grid">
+          <div class="feature">
+            <h3>Invite & Onboard</h3>
+            <p>Quickly add users, assign roles, and get teams productive.</p>
+          </div>
+          <div class="feature">
+            <h3>Role Management</h3>
+            <p>Fine-grained permissions and role templates to simplify access control.</p>
+          </div>
+          <div class="feature">
+            <h3>Reports & Audit</h3>
+            <p>Export activity logs and generate user reports with one click.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="signup" class="signup container">
+        <div class="signup-inner">
+          <div class="signup-info">
+            <h2>Start managing users today</h2>
+            <p>Sign up for a free trial — no credit card required.</p>
+          </div>
+          <form id="signup-form" class="signup-form" action="#">
+            <input type="text" name="name" placeholder="Full name" required>
+            <input type="email" name="email" placeholder="Email address" required>
+            <button class="btn btn-primary" type="submit">Create account</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div>© <span id="year"></span> UserManager</div>
+        <div class="footer-links">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+        </div>
+      </div>
+    </footer>
+
     <div id="root"></div>
+    <script>
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      (function(){
+        const form = document.getElementById('signup-form');
+        if(!form) return;
+        form.addEventListener('submit', async function(e){
+          e.preventDefault();
+          const name = (form.elements.namedItem('name') || {}).value || '';
+          const email = (form.elements.namedItem('email') || {}).value || '';
+          try{
+            const res = await fetch('/api/users', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name: name.trim(), email: email.trim() })
+            });
+            if(!res.ok){
+              const text = await res.text();
+              alert('Signup failed: ' + res.status + ' ' + text);
+              return;
+            }
+            const data = await res.json();
+            alert('Account created for ' + (data.name || data.email || 'user'));
+            form.reset();
+          }catch(err){
+            console.error(err);
+            alert('Network error — please try again');
+          }
+        });
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
