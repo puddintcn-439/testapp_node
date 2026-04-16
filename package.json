@@ -4,12 +4,11 @@
   "description": "A basic Node.js app with TypeScript",
   "main": "dist/index.js",
   "scripts": {
-    "build": "npm run build --prefix client && tsc",
+    "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
     "dev:client": "npm run dev --prefix client",
-    "dev:all": "concurrently \"npm run dev\" \"npm run dev:client\"",
-    "postinstall": "npm --prefix client install"
+    "dev:all": "concurrently \"npm run dev\" \"npm run dev:client\""
   },
   "keywords": [],
   "author": "",
@@ -27,7 +26,6 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.5.0"
   },
-  
   "dependencies": {
     "cors": "^2.8.6",
     "dotenv": "^17.4.0",
