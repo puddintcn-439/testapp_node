@@ -327,6 +327,34 @@ getYear();
   </script>
   <!-- End Google Map -->
 
+  <!-- DEBUG: nav click diagnostics -->
+  <script>
+    (function(){
+      function log(...args){ try{ console.log.apply(console, args); }catch(e){} }
+      document.addEventListener('DOMContentLoaded', function(){
+        log('DEBUG: nav diagnostics active');
+        var navs = document.querySelectorAll('.nav-link');
+        navs.forEach(function(a,i){
+          a.addEventListener('click', function(e){
+            log('NAV CLICK:', i, a.href, 'hrefAttr=', a.getAttribute('href'));
+            setTimeout(function(){ log('NAV CLICK after handlers defaultPrevented=', e.defaultPrevented); }, 0);
+          }, true);
+        });
+
+        document.addEventListener('click', function(e){
+          try{
+            var t = e.target;
+            var rect = t.getBoundingClientRect ? t.getBoundingClientRect() : null;
+            log('DOCUMENT click capture:', t.tagName, t.className, 'id=', t.id, 'rect=', rect);
+            if(rect){ var el = document.elementFromPoint(Math.round(rect.left + rect.width/2), Math.round(rect.top + rect.height/2)); log('elementFromPoint:', el && el.tagName, el); }
+          }catch(err){ log('debug err', err); }
+        }, true);
+
+        try{ if(window.getEventListeners){ navs.forEach(function(a){ log('listeners for', a, window.getEventListeners(a)); }); } }catch(e){}
+      });
+    })();
+  </script>
+
 </body>
 
 </html>
