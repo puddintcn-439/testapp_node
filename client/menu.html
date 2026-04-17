@@ -996,7 +996,7 @@
   });
 
   /** google_map js **/
-  function myMap() {
+  function initMap() {
     if (!window.google || !google.maps) return;
     var mapProp = {
       center: new google.maps.LatLng(40.712775, -74.005973),
@@ -1007,7 +1007,7 @@
     var map = new google.maps.Map(mapEl, mapProp);
   }
   // ensure callback is available on global scope for Google Maps
-  window.myMap = myMap;
+  window.initMap = initMap;
 
   // client section owl carousel
   $(document).ready(function(){
@@ -1034,7 +1034,7 @@
   });
     </script>
   <!-- Google Map -->
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh39n5U-4IoWpsVGUHWdqB6puEkhRLdmI&callback=myMap"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh39n5U-4IoWpsVGUHWdqB6puEkhRLdmI&callback=initMap"></script>
   <!-- End Google Map -->
 
 </body>
