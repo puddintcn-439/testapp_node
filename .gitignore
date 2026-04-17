@@ -3,3 +3,10 @@ dist/
 *.js.map
 .env
 client/dist/
+client/node_modules/
+client/dist/
+*.log
+/.env.local
+/.env.*.local
+.vercel/
+.DS_Store
