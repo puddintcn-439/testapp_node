@@ -31,7 +31,9 @@ if (!process.env.VERCEL) {
       );
     })
     .catch((err) => {
-      console.error("DB init failed:", err.message || err);
-      process.exit(1);
+      console.warn("DB init failed; starting server without DB:", err.message || err);
+      app.listen(port, () =>
+        console.log(`Server running at http://localhost:${port} (DB unavailable)`)
+      );
     });
 }
