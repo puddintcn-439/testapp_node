@@ -1406,22 +1406,49 @@ getYear();
         return p || '/';
       }
 
-      try{
-        // header active normalization
-        var current = normalize(window.location.pathname || '/');
-        document.querySelectorAll('.navbar-nav .nav-item').forEach(function(li){ li.classList.remove('active'); });
-        document.querySelectorAll('.nav-link').forEach(function(link){
-          try{
-            var href = link.getAttribute('href') || '';
-            var nh = normalize(href);
-            var li = link.closest('.nav-item') || link.parentNode;
-            if (!li) return;
-            if (nh === current || (nh !== '/' && current.indexOf(nh) === 0) ) {
-              li.classList.add('active');
-            }
-          }catch(e){}
-        });
-      } catch(e){ console.error('nav active set failed', e); }
+      function setHeaderActive(){
+        try{
+          var current = normalize(window.location.pathname || '/');
+          var links = document.querySelectorAll('.navbar-nav .nav-link');
+          // remove active from all
+          document.querySelectorAll('.navbar-nav .nav-item').forEach(function(li){ li.classList.remove('active'); });
+
+          var curHash = (window.location.hash || '').toLowerCase();
+          var matched = false;
+
+          // priority 1: hash match (if link contains #...)
+          if (curHash){
+            links.forEach(function(link){
+              try{
+                var href = link.getAttribute('href') || '';
+                if (href.indexOf('#') !== -1){
+                  var linkHash = '#'+href.split('#')[1].toLowerCase();
+                  if (linkHash === curHash){ var li = link.closest('.nav-item') || link.parentNode; if(li) { li.classList.add('active'); matched = true; } }
+                }
+              }catch(e){}
+            });
+            if (matched) return;
+          }
+
+          // priority 2: pathname
+          links.forEach(function(link){
+            try{
+              var href = link.getAttribute('href') || '';
+              var baseHref = href.split('#')[0];
+              var nh = normalize(baseHref);
+              var li = link.closest('.nav-item') || link.parentNode;
+              if (!li) return;
+              if (nh === current || (nh !== '/' && current.indexOf(nh) === 0) || (nh === '/index' && current === '/')){
+                li.classList.add('active'); matched = true;
+              }
+            }catch(e){}
+          });
+        } catch(e){ console.error('nav active set failed', e); }
+      }
+
+      // initial set and respond to hash changes
+      document.addEventListener('DOMContentLoaded', setHeaderActive);
+      window.addEventListener('hashchange', setHeaderActive);
 
       // filters fallback (if page has .filters_menu)
       try{
@@ -1433,7 +1460,7 @@ getYear();
               items.forEach(function(it){ it.style.display = ''; });
               return;
             }
-            var cls = sel.replace(/^\./, '');
+            var cls = sel.replace(/^\\./, '');
             items.forEach(function(it){ if(it.classList && it.classList.contains(cls)) it.style.display = ''; else it.style.display = 'none'; });
           }
 
