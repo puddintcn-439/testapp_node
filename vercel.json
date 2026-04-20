@@ -1,13 +1,11 @@
 {
   "version": 2,
+  "outputDirectory": "client",
   "builds": [
-    { "src": "api/index.ts", "use": "@vercel/node" },
-    { "src": "client/**", "use": "@vercel/static" }
+    { "src": "api/index.ts", "use": "@vercel/node" }
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/index.ts" },
-    { "src": "/api",      "dest": "/api/index.ts" },
-    { "src": "/",         "dest": "/client/index.html" },
-    { "src": "/(.*)",     "dest": "/client/$1" }
+    { "src": "/api",      "dest": "/api/index.ts" }
   ]
 }
