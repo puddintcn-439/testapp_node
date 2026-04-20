@@ -1131,6 +1131,36 @@
           }, true);
         });
 
+        // try to auto-set the header nav `active` state using a normalized pathname
+        try {
+          var normalizePath = function(p){
+            if (!p) return '/';
+            try { var u = new URL(p, window.location.origin); p = u.pathname; } catch(e) { /* ignore */ }
+            // remove trailing slash (except root)
+            if (p.length > 1 && p.endsWith('/')) p = p.slice(0, -1);
+            // strip .html suffix to normalize static builds
+            p = p.replace(/\.html$/i, '');
+            return p || '/';
+          };
+
+          var current = normalizePath(window.location.pathname || '/');
+          var navItems = document.querySelectorAll('.navbar-nav .nav-item');
+          navItems.forEach(function(li){ li.classList.remove('active'); });
+
+          navs.forEach(function(a){
+            try{
+              var href = a.getAttribute('href') || '';
+              var nh = normalizePath(href);
+              var li = a.closest('.nav-item') || a.parentNode;
+              if (!li) return;
+              // match exact or prefix (handles /menu and /menu/sub)
+              if (nh === current || current.indexOf(nh) === 0 || nh.indexOf(current) === 0) {
+                li.classList.add('active');
+              }
+            }catch(err){}
+          });
+        } catch(err){ log('nav active set failed', err); }
+
         document.addEventListener('click', function(e){
           try{
             var t = e.target;
