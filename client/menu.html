@@ -1178,6 +1178,88 @@
         } catch (err){ console.error('menu fallback failed', err); }
       })();
     </script>
+
+    <!-- Robust unified filter handler (Isotope + DOM fallback) -->
+    <script>
+    (function(){
+      function log(){ try{ console.log.apply(console, arguments); }catch(e){} }
+
+      function initIsotopeIfNeeded(){
+        try{
+          if (window.Isotope && window.jQuery && !window.$grid){
+            try{
+              window.$grid = window.jQuery('.grid').isotope({
+                itemSelector: '.all',
+                percentPosition: false,
+                masonry: { columnWidth: '.all' }
+              });
+              log('DEBUG: isotope initialized (unified handler)');
+            }catch(e){ log('DEBUG: isotope init error', e); window.$grid = null; }
+          }
+        }catch(e){ log('DEBUG: isotope init failed', e); }
+      }
+
+      function applyFilter(sel){
+        if(!sel) return;
+        log('DEBUG: applyFilter', sel);
+        // try isotope first
+        try{
+          if (window.$grid && typeof window.$grid.isotope === 'function'){
+            window.$grid.isotope({ filter: sel });
+            return;
+          }
+        }catch(e){ log('DEBUG: isotope filter failed', e); }
+
+        // DOM fallback
+        try{
+          var items = document.querySelectorAll('.grid .all');
+          if(!items || items.length === 0) return;
+          if (sel === '*' || sel === '.*'){
+            items.forEach(function(it){ it.style.display = ''; });
+            return;
+          }
+          var cls = String(sel).replace(/^\./, '');
+          items.forEach(function(it){ if (it.classList && it.classList.contains(cls)) it.style.display = ''; else it.style.display = 'none'; });
+        }catch(e){ log('DEBUG: DOM fallback failed', e); }
+      }
+
+      function bindFilters(){
+        try{
+          var menu = document.querySelector('.filters_menu');
+          if(!menu) return;
+          menu.addEventListener('click', function(e){
+            try{
+              var li = e.target.closest('li');
+              if(!li) return;
+              e.preventDefault && e.preventDefault();
+              // toggle active class
+              Array.prototype.forEach.call(menu.querySelectorAll('li'), function(x){ x.classList.remove('active'); });
+              li.classList.add('active');
+              var sel = li.getAttribute('data-filter') || '*';
+              applyFilter(sel);
+            }catch(err){ log('DEBUG: filter click handler error', err); }
+          }, false);
+        }catch(e){ log('DEBUG: bindFilters failed', e); }
+      }
+
+      function applyInitial(){
+        try{
+          var applied = false;
+          var h = (window.location.hash || '').replace('#','');
+          if(h){ var sel = h.charAt(0)==='.'? h : '.'+h; applyFilter(sel); var li = document.querySelector('.filters_menu li[data-filter="'+sel+'"]'); if(li) li.classList.add('active'); applied = true; }
+          if(!applied){ try{ var params = new URLSearchParams(window.location.search); if(params.has('filter')){ var f = params.get('filter')||''; var sel = f.charAt(0)==='.'? f : '.'+f; applyFilter(sel); var li = document.querySelector('.filters_menu li[data-filter="'+sel+'"]'); if(li) li.classList.add('active'); applied = true; } }catch(e){}
+        }catch(e){ log('DEBUG: applyInitial failed', e); }
+      }
+
+      function init(){
+        initIsotopeIfNeeded();
+        bindFilters();
+        applyInitial();
+      }
+
+      if (document.readyState === 'complete') init(); else window.addEventListener('load', init);
+    })();
+    </script>
   <!-- Google Map -->
   <script>
     (function loadGoogleMaps(){
