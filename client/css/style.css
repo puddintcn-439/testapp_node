@@ -1004,4 +1004,9 @@ a:focus {
 .footer_section .footer-info p a {
   color: inherit;
 }
+/* Helper used by filter fallbacks: hide grid items reliably */
+.grid .all.hidden { display: none !important; }
+/* Ensure isotope absolute positioning doesn't leave gaps when items hidden */
+.grid { display: flex; flex-wrap: wrap; }
+.grid .all { box-sizing: border-box; }
 /*# sourceMappingURL=style.css.map */

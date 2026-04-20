@@ -1019,15 +1019,15 @@
         // use isotope when available
         window.$grid.isotope({ filter: data });
       } else {
-        // fallback: simple show/hide without isotope
+        // fallback: toggle `hidden` class (more robust than inline display)
         try {
           if (data === '*') {
-            $('.grid .all').show();
+            $('.grid .all').removeClass('hidden');
           } else {
             var cls = data.replace('.', '');
             $('.grid .all').each(function() {
               var $it = $(this);
-              if ($it.hasClass(cls)) $it.show(); else $it.hide();
+              if ($it.hasClass(cls)) $it.removeClass('hidden'); else $it.addClass('hidden');
             });
           }
         } catch (err) {
@@ -1057,12 +1057,12 @@
           window.$grid.isotope({ filter: sel });
         } else {
           if (sel === '*' || sel === '.*') {
-            $('.grid .all').show();
+            $('.grid .all').removeClass('hidden');
           } else {
             var cls = sel.replace('.', '');
             $('.grid .all').each(function() {
               var $it = $(this);
-              if ($it.hasClass(cls)) $it.show(); else $it.hide();
+              if ($it.hasClass(cls)) $it.removeClass('hidden'); else $it.addClass('hidden');
             });
           }
         }
@@ -1215,11 +1215,11 @@
           var items = document.querySelectorAll('.grid .all');
           if(!items || items.length === 0) return;
           if (sel === '*' || sel === '.*'){
-            items.forEach(function(it){ it.style.display = ''; });
+            items.forEach(function(it){ if(it.classList) it.classList.remove('hidden'); });
             return;
           }
           var cls = String(sel).replace(/^\./, '');
-          items.forEach(function(it){ if (it.classList && it.classList.contains(cls)) it.style.display = ''; else it.style.display = 'none'; });
+          items.forEach(function(it){ if (it.classList && it.classList.contains(cls)) it.classList.remove('hidden'); else if(it.classList) it.classList.add('hidden'); });
         }catch(e){ log('DEBUG: DOM fallback failed', e); }
       }
 

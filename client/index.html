@@ -1459,11 +1459,11 @@ getYear();
           function applyFilterSelector(sel){
             if(!sel) return;
             if(sel === '*' || sel === '.*'){
-              items.forEach(function(it){ it.style.display = ''; });
-              return;
-            }
-            var cls = sel.replace(/^\\./, '');
-            items.forEach(function(it){ if(it.classList && it.classList.contains(cls)) it.style.display = ''; else it.style.display = 'none'; });
+                items.forEach(function(it){ if(it.classList) it.classList.remove('hidden'); });
+                return;
+              }
+              var cls = sel.replace(/^\./, '');
+              items.forEach(function(it){ if(it.classList && it.classList.contains(cls)) it.classList.remove('hidden'); else if(it.classList) it.classList.add('hidden'); });
           }
 
           // bind clicks
