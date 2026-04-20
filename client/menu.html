@@ -1123,6 +1123,17 @@
       function log(...args){ try{ console.log.apply(console, args); }catch(e){} }
       document.addEventListener('DOMContentLoaded', function(){
         log('DEBUG: nav diagnostics active');
+        // runtime diagnostics: presence of jQuery/Isotope and filter items
+        try {
+          log('DEBUG: jQuery present', !!window.jQuery, typeof window.jQuery);
+          log('DEBUG: Isotope present', !!window.Isotope, !!window.$grid, typeof window.Isotope);
+          var filters = document.querySelectorAll('.filters_menu li') || [];
+          log('DEBUG: filters count', filters.length);
+          filters.forEach(function(li, idx){
+            try { log('DEBUG: filter', idx, li.textContent.trim(), li.getAttribute('data-filter')); } catch(e){}
+          });
+          log('DEBUG: current pathname', window.location.pathname, 'hash', window.location.hash, 'search', window.location.search);
+        } catch(e){ log('DEBUG: diagnostics failed', e); }
         var navs = document.querySelectorAll('.nav-link');
         navs.forEach(function(a,i){
           a.addEventListener('click', function(e){
