@@ -969,16 +969,19 @@
 
   // isotope js
   $(window).on('load', function () {
-    $('.filters_menu li').click(function () {
+    // prevent anchor navigation inside the filters (some templates wrap labels with <a>)
+    $('.filters_menu').on('click', 'a', function (e) {
+      try { e.preventDefault(); } catch (err) {}
+    });
+
+    $('.filters_menu li').click(function (e) {
       $('.filters_menu li').removeClass('active');
       $(this).addClass('active');
 
       var data = $(this).attr('data-filter');
       if (window.$grid) {
         // use isotope when available
-        window.$grid.isotope({
-          filter: data
-        });
+        window.$grid.isotope({ filter: data });
       } else {
         // fallback: simple show/hide without isotope
         try {
@@ -1000,10 +1003,58 @@
     window.$grid = $(".grid").isotope({
       itemSelector: ".all",
       percentPosition: false,
-      masonry: {
-        columnWidth: ".all"
+      masonry: { columnWidth: ".all" }
+    });
+
+    // Apply filter from URL hash (#burger) or ?filter=burger on first load
+    try {
+      var applied = false;
+      var applyFilterBySelector = function(sel) {
+        if (!sel) return;
+        $('.filters_menu li').removeClass('active');
+        var li = $('.filters_menu li[data-filter="' + sel + '"]');
+        if (li.length === 0 && sel.charAt(0) !== '.') {
+          li = $('.filters_menu li[data-filter=".' + sel + '"]');
+        }
+        if (li.length) li.addClass('active');
+        if (window.$grid) {
+          window.$grid.isotope({ filter: sel });
+        } else {
+          if (sel === '*' || sel === '.*') {
+            $('.grid .all').show();
+          } else {
+            var cls = sel.replace('.', '');
+            $('.grid .all').each(function() {
+              var $it = $(this);
+              if ($it.hasClass(cls)) $it.show(); else $it.hide();
+            });
+          }
+        }
+        applied = true;
+      };
+
+      var hash = window.location.hash;
+      if (hash) {
+        var key = hash.replace('#', '');
+        if (key) {
+          var sel = key.charAt(0) === '.' ? key : '.' + key;
+          applyFilterBySelector(sel);
+        }
       }
-    })
+
+      if (!applied) {
+        var params = new URLSearchParams(window.location.search);
+        if (params.has('filter')) {
+          var f = params.get('filter');
+          if (f) {
+            var sel = f.charAt(0) === '.' ? f : '.' + f;
+            applyFilterBySelector(sel);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('initial filter by URL failed', err);
+    }
   });
 
   // nice select
