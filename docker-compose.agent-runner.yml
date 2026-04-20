@@ -1,0 +1,24 @@
+version: '3.8'
+services:
+  agent-runner:
+    build:
+      context: ./agent-runner
+      dockerfile: Dockerfile
+    ports:
+      - "3333:3333"
+    environment:
+      - PORT=3333
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - LLM_API_KEY=${LLM_API_KEY}
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET}
+    volumes:
+      - ./agent-runner/logs:/app/logs
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
