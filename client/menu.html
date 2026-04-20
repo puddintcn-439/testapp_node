@@ -1134,6 +1134,48 @@
     }
   });
     </script>
+    <script>
+      (function(){
+        if (window.jQuery) return; // jQuery available -> existing handlers will run
+        try {
+          var filters = document.querySelectorAll('.filters_menu li');
+          var items = document.querySelectorAll('.grid .all');
+          if (!filters || !filters.length || !items) return;
+
+          function applyFilter(sel){
+            if (!sel) return;
+            if (sel === '*' || sel === '.*'){
+              items.forEach(function(it){ it.style.display = ''; });
+              return;
+            }
+            var cls = String(sel).replace(/^\./, '');
+            items.forEach(function(it){ if (it.classList && it.classList.contains(cls)) it.style.display = ''; else it.style.display = 'none'; });
+          }
+
+          filters.forEach(function(li){
+            li.addEventListener('click', function(e){
+              try{ if (e && e.preventDefault) e.preventDefault(); }catch(_){}
+              filters.forEach(function(x){ x.classList.remove('active'); });
+              li.classList.add('active');
+              var data = li.getAttribute('data-filter') || '*';
+              applyFilter(data);
+            });
+          });
+
+          // initial from hash or ?filter
+          var applied = false;
+          if (window.location.hash){
+            var key = window.location.hash.replace('#','');
+            if (key){ var sel = key.charAt(0)==='.'?key:'.'+key; applyFilter(sel); filters.forEach(function(li){ if(li.getAttribute('data-filter')===sel) li.classList.add('active'); }); applied = true; }
+          }
+          if (!applied){
+            try{ var params = new URLSearchParams(window.location.search); if(params.has('filter')){ var f = params.get('filter'); var sel = f.charAt(0)==='.'?f:'.'+f; applyFilter(sel); filters.forEach(function(li){ if(li.getAttribute('data-filter')===sel) li.classList.add('active'); }); } }catch(e){}
+          }
+
+          console.log('DEBUG: menu filter fallback applied (no jQuery)');
+        } catch (err){ console.error('menu fallback failed', err); }
+      })();
+    </script>
   <!-- Google Map -->
   <script>
     (function loadGoogleMaps(){
