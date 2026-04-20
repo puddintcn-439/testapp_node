@@ -975,9 +975,25 @@
 
       var data = $(this).attr('data-filter');
       if (window.$grid) {
+        // use isotope when available
         window.$grid.isotope({
           filter: data
         });
+      } else {
+        // fallback: simple show/hide without isotope
+        try {
+          if (data === '*') {
+            $('.grid .all').show();
+          } else {
+            var cls = data.replace('.', '');
+            $('.grid .all').each(function() {
+              var $it = $(this);
+              if ($it.hasClass(cls)) $it.show(); else $it.hide();
+            });
+          }
+        } catch (err) {
+          console.error('Fallback filter failed', err);
+        }
       }
     });
 
