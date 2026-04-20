@@ -1250,7 +1250,9 @@
                 }
               }
               // then pathname (exact or sensible prefix), avoid matching root too broadly
-              if (nh === current || (nh !== '/' && current.indexOf(nh) === 0) || (nh === '/index' && current === '/')){
+              if (href.indexOf('#') !== -1 && baseHref === '/') {
+                // skip anchor-only links when matching by pathname
+              } else if (nh === current || (nh !== '/' && current.indexOf(nh) === 0) || (nh === '/index' && current === '/')){
                 li.classList.add('active');
               }
             }catch(err){}

@@ -55,14 +55,14 @@
 
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav  mx-auto ">
-              <li class="nav-item ">
+              <li class="nav-item">
                 <a class="nav-link" href="index.html">Home </a>
               </li>
                 <li class="nav-item">
                   <a class="nav-link" href="/#menu">Menu</a>
                 </li>
-                <li class="nav-item active">
-                  <a class="nav-link" href="/#about">About <span class="sr-only">(current)</span> </a>
+                <li class="nav-item">
+                  <a class="nav-link" href="/#about">About</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="/#book">Book Table</a>
@@ -356,7 +356,16 @@ getYear();
             if (matched) return;
           }
           links.forEach(function(link){
-            try{ var href = link.getAttribute('href') || ''; var baseHref = href.split('#')[0]; var nh = normalize(baseHref); var li = link.closest('.nav-item') || link.parentNode; if (!li) return; if (nh === current || (nh !== '/' && current.indexOf(nh) === 0) || (nh === '/index' && current === '/')){ li.classList.add('active'); matched = true; } }catch(e){}
+            try{
+              var href = link.getAttribute('href') || '';
+              var baseHref = href.split('#')[0];
+              var li = link.closest('.nav-item') || link.parentNode;
+              if (!li) return;
+              if (href.indexOf('#') !== -1 && baseHref === '/') return;
+              var nh = normalize(baseHref);
+              if (nh === current || (nh !== '/' && current.indexOf(nh) === 0) || (nh === '/index' && current === '/')){
+                li.classList.add('active'); matched = true; }
+            }catch(e){}
           });
         } catch(e){ console.error('nav active set failed', e); }
       }

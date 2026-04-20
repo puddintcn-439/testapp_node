@@ -304,7 +304,15 @@
             if (matched) return;
           }
           links.forEach(function(link){
-            try{ var href = link.getAttribute('href') || ''; var baseHref = href.split('#')[0]; var nh = normalize(baseHref); var li = link.closest('.nav-item') || link.parentNode; if (!li) return; if (nh === current || (nh !== '/' && current.indexOf(nh) === 0) ) { li.classList.add('active'); matched = true; } }catch(e){}
+            try{
+              var href = link.getAttribute('href') || '';
+              var baseHref = href.split('#')[0];
+              var li = link.closest('.nav-item') || link.parentNode;
+              if (!li) return;
+              if (href.indexOf('#') !== -1 && baseHref === '/') return;
+              var nh = normalize(baseHref);
+              if (nh === current || (nh !== '/' && current.indexOf(nh) === 0) ) { li.classList.add('active'); matched = true; }
+            }catch(e){}
           });
         } catch(e){ console.error('nav active set failed', e); }
       }
