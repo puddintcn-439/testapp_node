@@ -276,6 +276,89 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=myMap"></script>
   <!-- End Google Map -->
 
+  <!-- Robust nav + filter handlers (fallback if external JS fails) -->
+  <script>
+    (function(){
+      function normalize(p){
+        if(!p) return '/';
+        try{ p = p.toString(); }catch(e){}
+        try{ if (p.indexOf('http') === 0) p = new URL(p).pathname; } catch(e){}
+        p = p.split('?')[0].split('#')[0];
+        if (p.length > 1 && p.endsWith('/')) p = p.slice(0, -1);
+        p = p.replace(/\.html$/i, '');
+        return p || '/';
+      }
+
+      // set header active based on pathname (works for /menu.html and /menu)
+      try {
+        var current = normalize(window.location.pathname || '/');
+        document.querySelectorAll('.navbar-nav .nav-item').forEach(function(li){ li.classList.remove('active'); });
+        document.querySelectorAll('.nav-link').forEach(function(link){
+          try{
+            var href = link.getAttribute('href') || '';
+            var nh = normalize(href);
+            var li = link.closest('.nav-item') || link.parentNode;
+            if (!li) return;
+            if (nh === current || (nh !== '/' && current.indexOf(nh) === 0) ) {
+              li.classList.add('active');
+            }
+          }catch(e){}
+        });
+      } catch(e){ console.error('nav active set failed', e); }
+
+      // filters: vanilla fallback + try to use Isotope if available
+      function applyFilterSelector(sel){
+        if(!sel) return;
+        var items = document.querySelectorAll('.grid .all');
+        if(!items || items.length === 0) return;
+        if(sel === '*' || sel === '.*'){
+          items.forEach(function(it){ it.style.display = ''; });
+          return;
+        }
+        var cls = sel.replace(/^\./, '');
+        items.forEach(function(it){
+          if(it.classList && it.classList.contains(cls)) it.style.display = ''; else it.style.display = 'none';
+        });
+      }
+
+      try{
+        // prevent anchor navigation inside filters
+        document.querySelectorAll('.filters_menu a').forEach(function(a){ a.addEventListener('click', function(e){ try{ e.preventDefault(); }catch(_){} }); });
+
+        document.querySelectorAll('.filters_menu li').forEach(function(li){
+          li.addEventListener('click', function(e){
+            document.querySelectorAll('.filters_menu li').forEach(function(x){ x.classList.remove('active'); });
+            li.classList.add('active');
+            var data = li.getAttribute('data-filter') || '*';
+            // prefer Isotope if present
+            try{
+              if(window.$grid && typeof window.$grid.isotope === 'function'){
+                window.$grid.isotope({ filter: data });
+                return;
+              }
+              if(window.Isotope && typeof window.Isotope === 'function'){
+                var gridEl = document.querySelector('.grid');
+                if(gridEl && gridEl._isotope && typeof gridEl._isotope.arrange === 'function'){
+                  gridEl._isotope.arrange({ filter: data });
+                  return;
+                }
+              }
+            }catch(err){ /* fallthrough to vanilla */ }
+            applyFilterSelector(data);
+          });
+        });
+
+        // initial filter from hash or query
+        var applied = false;
+        var h = window.location.hash.replace('#','');
+        if(h){ var sel = h.charAt(0)==='.'?h:'.'+h; applyFilterSelector(sel); applied = true; document.querySelectorAll('.filters_menu li').forEach(function(li){ if(li.getAttribute('data-filter')===sel) li.classList.add('active'); }); }
+        if(!applied){ var params = new URLSearchParams(window.location.search); if(params.has('filter')){ var f = params.get('filter'); var sel = f.charAt(0)==='.'?f:'.'+f; applyFilterSelector(sel); document.querySelectorAll('.filters_menu li').forEach(function(li){ if(li.getAttribute('data-filter')===sel) li.classList.add('active'); }); } }
+
+      }catch(e){ console.error('filters init failed', e); }
+
+    })();
+  </script>
+
 </body>
 
 </html>
