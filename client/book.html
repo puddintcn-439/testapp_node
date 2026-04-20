@@ -49,7 +49,7 @@
             </span>
           </a>
 
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="#navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class=""> </span>
           </button>
 
@@ -73,17 +73,17 @@
                 <i class="fa fa-user" aria-hidden="true"></i>
               </a>
               <a class="cart_link" href="#">
-                <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 456.029 456.029" style="enable-background:new 0 0 456.029 456.029;" xml:space="preserve">
-                 <a class="nav-link" href="/index.html">Home </a>
+                <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 456.029 456.029" xml:space="preserve">
+                  <g>
                     <g>
                       <path d="M345.6,338.862c-29.184,0-53.248,23.552-53.248,53.248c0,29.184,23.552,53.248,53.248,53.248
-                 <a class="nav-link" href="/menu.html">Menu</a>
+                   c29.184,0,53.248-23.552,53.248-53.248C398.336,362.926,374.784,338.862,345.6,338.862z" />
                     </g>
                   </g>
-                 <a class="nav-link" href="/about.html">About</a>
+                  <g>
                     <g>
                       <path d="M439.296,84.91c-1.024,0-2.56-0.512-4.096-0.512H112.64l-5.12-34.304C104.448,27.566,84.992,10.67,61.952,10.67H20.48
-                 <a class="nav-link" href="/book.html">Book Table <span class="sr-only">(current)</span> </a>
+                   C9.216,10.67,0,19.886,0,31.15c0,11.264,9.216,20.48,20.48,20.48h41.472c2.56,0,4.608,2.048,5.12,4.608l31.744,216.064
                    c4.096,27.136,27.648,47.616,55.296,47.616h212.992c26.624,0,49.664-18.944,55.296-45.056l33.28-166.4
                    C457.728,97.71,450.56,86.958,439.296,84.91z" />
                     </g>
@@ -93,36 +93,6 @@
                       <path d="M215.04,389.55c-1.024-28.16-24.576-50.688-52.736-50.688c-29.696,1.536-52.224,26.112-51.2,55.296
                    c1.024,28.16,24.064,50.688,52.224,50.688h1.024C193.536,443.31,216.576,418.734,215.04,389.55z" />
                     </g>
-                  </g>
-                  <g>
-                  </g>
-                  <g>
-                  </g>
-                  <g>
-                  </g>
-                  <g>
-                  </g>
-                  <g>
-                  </g>
-                  <g>
-                  </g>
-                  <g>
-                  </g>
-                  <g>
-                  </g>
-                  <g>
-                  </g>
-                  <g>
-                  </g>
-                  <g>
-                  </g>
-                  <g>
-                  </g>
-                  <g>
-                  </g>
-                  <g>
-                  </g>
-                  <g>
                   </g>
                 </svg>
               </a>
@@ -201,6 +171,7 @@
       </div>
     </div>
   </section>
+
   <!-- end book section -->
 
   <!-- footer section -->
@@ -298,62 +269,12 @@
   <!-- isotope js -->
   <script src="https://unpkg.com/isotope-layout@3.0.4/dist/isotope.pkgd.min.js"></script>
   <!-- nice select -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js"></script>
-  <script>
-// to get current year
-function getYear() {
-    var currentDate = new Date();
-    var currentYear = currentDate.getFullYear();
-    var el = document.querySelector("#displayYear");
-    if (el) el.innerHTML = currentYear;
-}
-
-getYear();
-  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js" integrity="sha512-Nu4EXE6o1G6Vn2sJ0vM1QmZ0k9V7n3RZV3Jb0m1QmZ0k9V7n3RZV3Jb0m1Q==" crossorigin="anonymous"></script>
+  <!-- custom js -->
+  <script src="js/custom.js"></script>
   <!-- Google Map -->
-  <script>
-    (function loadGoogleMaps(){
-      var key = 'AIzaSyCh39n5U-4IoWpsVGUHWdqB6puEkhRLdmI';
-      var url = 'https://maps.googleapis.com/maps/api/js?key=' + key;
-      if (document.querySelector('script[src*="maps.googleapis.com/maps/api/js"]')) return;
-      var s = document.createElement('script');
-      s.src = url;
-      s.async = true;
-      s.defer = true;
-      s.onload = function(){ if (typeof window.initMap === 'function') window.initMap(); };
-      s.onerror = function(){ console.error('Google Maps failed to load'); };
-      document.head.appendChild(s);
-    })();
-  </script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=myMap"></script>
   <!-- End Google Map -->
-
-  <!-- DEBUG: nav click diagnostics -->
-  <script>
-    (function(){
-      function log(...args){ try{ console.log.apply(console, args); }catch(e){} }
-      document.addEventListener('DOMContentLoaded', function(){
-        log('DEBUG: nav diagnostics active');
-        var navs = document.querySelectorAll('.nav-link');
-        navs.forEach(function(a,i){
-          a.addEventListener('click', function(e){
-            log('NAV CLICK:', i, a.href, 'hrefAttr=', a.getAttribute('href'));
-            setTimeout(function(){ log('NAV CLICK after handlers defaultPrevented=', e.defaultPrevented); }, 0);
-          }, true);
-        });
-
-        document.addEventListener('click', function(e){
-          try{
-            var t = e.target;
-            var rect = t.getBoundingClientRect ? t.getBoundingClientRect() : null;
-            log('DOCUMENT click capture:', t.tagName, t.className, 'id=', t.id, 'rect=', rect);
-            if(rect){ var el = document.elementFromPoint(Math.round(rect.left + rect.width/2), Math.round(rect.top + rect.height/2)); log('elementFromPoint:', el && el.tagName, el); }
-          }catch(err){ log('debug err', err); }
-        }, true);
-
-        try{ if(window.getEventListeners){ navs.forEach(function(a){ log('listeners for', a, window.getEventListeners(a)); }); } }catch(e){}
-      });
-    })();
-  </script>
 
 </body>
 
