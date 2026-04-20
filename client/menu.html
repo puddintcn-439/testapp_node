@@ -1225,9 +1225,7 @@
           var normalizePath = function(p){
             if (!p) return '/';
             try { var u = new URL(p, window.location.origin); p = u.pathname; } catch(e) { /* ignore */ }
-            // remove trailing slash (except root)
             if (p.length > 1 && p.endsWith('/')) p = p.slice(0, -1);
-            // strip .html suffix to normalize static builds
             p = p.replace(/\.html$/i, '');
             return p || '/';
           };
@@ -1236,14 +1234,23 @@
           var navItems = document.querySelectorAll('.navbar-nav .nav-item');
           navItems.forEach(function(li){ li.classList.remove('active'); });
 
+          var curHash = (window.location.hash || '').toLowerCase();
           navs.forEach(function(a){
             try{
               var href = a.getAttribute('href') || '';
-              var nh = normalizePath(href);
+              var baseHref = href.split('#')[0];
+              var nh = normalizePath(baseHref);
               var li = a.closest('.nav-item') || a.parentNode;
               if (!li) return;
-              // match exact or prefix (handles /menu and /menu/sub)
-              if (nh === current || current.indexOf(nh) === 0 || nh.indexOf(current) === 0) {
+              // prefer hash match first
+              if (curHash){
+                if (href.indexOf('#') !== -1){
+                  var linkHash = '#'+href.split('#')[1].toLowerCase();
+                  if (linkHash === curHash){ li.classList.add('active'); return; }
+                }
+              }
+              // then pathname (exact or sensible prefix), avoid matching root too broadly
+              if (nh === current || (nh !== '/' && current.indexOf(nh) === 0) || (nh === '/index' && current === '/')){
                 li.classList.add('active');
               }
             }catch(err){}
