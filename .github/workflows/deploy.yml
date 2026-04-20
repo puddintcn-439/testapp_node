@@ -49,11 +49,38 @@ jobs:
         working-directory: client
         run: npm ci
 
-      - name: Deploy to Vercel (with debug)
+      - name: Debug network to Vercel
         working-directory: client
-        # Use npx to fetch the latest vercel CLI and enable debug output for detailed logs
-        run: npx vercel@latest --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
+        run: |
+          echo "== DNS resolution for api.vercel.com =="
+          nslookup api.vercel.com || true
+          echo "== curl HEAD to api.vercel.com (10s timeout) =="
+          curl -I --max-time 10 https://api.vercel.com || true
+          echo "== TCP connect to api.vercel.com:443 (using /dev/tcp) =="
+          (echo > /dev/tcp/$(getent hosts api.vercel.com | awk '{print $1}' | head -n1)/443) 2>/dev/null || echo "tcp connect failed"
+
+      - name: Deploy to Vercel (with retries + debug)
+        working-directory: client
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_DEBUG: '1'
+        run: |
+          set -euo pipefail
+          RETRIES=3
+          for i in $(seq 1 $RETRIES); do
+            echo "Attempt $i of $RETRIES: deploying to Vercel..."
+            if npx --yes vercel@latest --prod --token="${{ secrets.VERCEL_TOKEN }}" --yes; then
+              echo "Vercel deploy succeeded on attempt $i"
+              exit 0
+            else
+              echo "Vercel deploy attempt $i failed"
+              if [ "$i" -lt "$RETRIES" ]; then
+                SLEEP=$((i * 10))
+                echo "Sleeping $SLEEP seconds before retrying..."
+                sleep $SLEEP
+              fi
+            fi
+          done
+          echo "All Vercel deploy attempts failed" >&2
+          exit 1
