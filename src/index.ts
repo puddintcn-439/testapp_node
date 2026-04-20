@@ -14,7 +14,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   : ["http://localhost:5173"];
 app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "..", "public")));
+app.use(express.static(path.join(__dirname, "..", "client")));
 
 app.use("/api/users", userRoutes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
