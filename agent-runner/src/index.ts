@@ -12,8 +12,6 @@ const rawBodySaver = (req: any, res: any, buf: Buffer, encoding: string) => {
   if (buf && buf.length) req.rawBody = buf;
 };
 app.use(bodyParser.json({ verify: rawBodySaver }));
-const app = express();
-app.use(bodyParser.json());
 
 // warn on missing critical envs
 if (!process.env.GITHUB_TOKEN) {

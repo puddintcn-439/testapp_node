@@ -24,6 +24,6 @@ describe('DeveloperAgent', () => {
   test('should create a draft PR when GITHUB_TOKEN present', async () => {
     const result = await developerHandle(sampleEvent, {});
     expect(result.pr).toBeDefined();
-    expect(result.pr.html_url).toContain('https://');
+    expect(result.pr?.html_url).toContain('https://');
   });
 });
