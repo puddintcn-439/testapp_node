@@ -1,0 +1,40 @@
+name: Reviewer Agent Automation
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  run-reviewer:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install runner deps
+        run: |
+          cd agent-runner
+          npm ci
+      - name: Build runner
+        run: |
+          cd agent-runner
+          npm run build
+      - name: Run ReviewerAgent locally
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+        run: |
+          node agent-runner/dist/cli-reviewer.js
+      - name: Run Danger (PR health checks)
+        uses: actions/setup-node@v4
+      - name: Run dangerJS
+        run: |
+          npm install -g danger
+          danger ci

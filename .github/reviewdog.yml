@@ -1,0 +1,6 @@
+runner: github-pr-check
+tool:
+  eslint:
+    cmd: "eslint -f json . || true"
+    parser: json
+    reporter: github-pr-review
