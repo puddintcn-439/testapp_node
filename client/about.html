@@ -55,18 +55,18 @@
 
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav  mx-auto ">
-              <li class="nav-item ">
+              <li class="nav-item">
                 <a class="nav-link" href="index.html">Home </a>
               </li>
-              <li class="nav-item">
-                 <a class="nav-link" href="/menu.html">Menu</a>
-              </li>
-              <li class="nav-item active">
-                 <a class="nav-link" href="/about.html">About <span class="sr-only">(current)</span> </a>
-              </li>
-              <li class="nav-item">
-                 <a class="nav-link" href="/book.html">Book Table</a>
-              </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/#menu">Menu</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/#about">About</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/#book">Book Table</a>
+                </li>
             </ul>
             <div class="user_option">
               <a href="" class="user_link">
@@ -328,7 +328,52 @@ getYear();
       });
     })();
   </script>
+</script>
+  <!-- Normalize header nav active for static .html routes -->
+  <script>
+    (function(){
+      function normalize(p){
+        if(!p) return '/';
+        try{ p = p.toString(); }catch(e){}
+        try{ if (p.indexOf('http') === 0) p = new URL(p).pathname; } catch(e){}
+        p = p.split('?')[0].split('#')[0];
+        if (p.length > 1 && p.endsWith('/')) p = p.slice(0, -1);
+        p = p.replace(/\.html$/i, '');
+        return p || '/';
+      }
 
+      function setHeaderActive(){
+        try{
+          var current = normalize(window.location.pathname || '/');
+          var links = document.querySelectorAll('.navbar-nav .nav-link');
+          document.querySelectorAll('.navbar-nav .nav-item').forEach(function(li){ li.classList.remove('active'); });
+          var curHash = (window.location.hash || '').toLowerCase();
+          var matched = false;
+          if (curHash){
+            links.forEach(function(link){
+              try{ var href = link.getAttribute('href') || ''; if (href.indexOf('#') !== -1){ var linkHash = '#'+href.split('#')[1].toLowerCase(); if (linkHash === curHash){ var li = link.closest('.nav-item') || link.parentNode; if(li){ li.classList.add('active'); matched = true; } } } }catch(e){}
+            });
+            if (matched) return;
+          }
+          links.forEach(function(link){
+            try{
+              var href = link.getAttribute('href') || '';
+              var baseHref = href.split('#')[0];
+              var li = link.closest('.nav-item') || link.parentNode;
+              if (!li) return;
+              if (href.indexOf('#') !== -1 && baseHref === '/') return;
+              var nh = normalize(baseHref);
+              if (nh === current || (nh !== '/' && current.indexOf(nh) === 0) || (nh === '/index' && current === '/')){
+                li.classList.add('active'); matched = true; }
+            }catch(e){}
+          });
+        } catch(e){ console.error('nav active set failed', e); }
+      }
+
+      document.addEventListener('DOMContentLoaded', setHeaderActive);
+      window.addEventListener('hashchange', setHeaderActive);
+    })();
+  </script>
 </body>
 
 </html>

@@ -55,17 +55,17 @@
 
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav  mx-auto ">
-              <li class="nav-item active">
-                <a class="nav-link" href="/index.html">Home <span class="sr-only">(current)</span></a>
+              <li class="nav-item">
+                <a class="nav-link" href="/index.html">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/menu.html">Menu</a>
+                <a class="nav-link" href="/#menu">Menu</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/about.html">About</a>
+                <a class="nav-link" href="/#about">About</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/book.html">Book Table</a>
+                <a class="nav-link" href="/#book">Book Table</a>
               </li>
             </ul>
             <div class="user_option">
@@ -374,7 +374,7 @@
 
   <!-- food section -->
 
-  <section class="food_section layout_padding-bottom">
+  <section id="menu" class="food_section layout_padding-bottom">
     <div class="container">
       <div class="heading_container heading_center">
         <h2>
@@ -1090,7 +1090,7 @@
 
   <!-- about section -->
 
-  <section class="about_section layout_padding">
+  <section id="about" class="about_section layout_padding">
     <div class="container  ">
 
       <div class="row">
@@ -1124,7 +1124,7 @@
   <!-- end about section -->
 
   <!-- book section -->
-  <section class="book_section layout_padding">
+  <section id="book" class="book_section layout_padding">
     <div class="container">
       <div class="heading_container">
         <h2>
@@ -1390,6 +1390,92 @@ getYear();
 
         try{ if(window.getEventListeners){ navs.forEach(function(a){ log('listeners for', a, window.getEventListeners(a)); }); } }catch(e){}
       });
+    })();
+  </script>
+
+  <!-- Normalize nav + filter fallback (robust for production static builds) -->
+  <script>
+    (function(){
+      function normalize(p){
+        if(!p) return '/';
+        try{ p = p.toString(); }catch(e){}
+        try{ if (p.indexOf('http') === 0) p = new URL(p).pathname; } catch(e){}
+        p = p.split('?')[0].split('#')[0];
+        if (p.length > 1 && p.endsWith('/')) p = p.slice(0, -1);
+        p = p.replace(/\.html$/i, '');
+        return p || '/';
+      }
+
+      function setHeaderActive(){
+        try{
+          var current = normalize(window.location.pathname || '/');
+          var links = document.querySelectorAll('.navbar-nav .nav-link');
+          // remove active from all
+          document.querySelectorAll('.navbar-nav .nav-item').forEach(function(li){ li.classList.remove('active'); });
+
+          var curHash = (window.location.hash || '').toLowerCase();
+          var matched = false;
+
+          // priority 1: hash match (if link contains #...)
+          if (curHash){
+            links.forEach(function(link){
+              try{
+                var href = link.getAttribute('href') || '';
+                if (href.indexOf('#') !== -1){
+                  var linkHash = '#'+href.split('#')[1].toLowerCase();
+                  if (linkHash === curHash){ var li = link.closest('.nav-item') || link.parentNode; if(li) { li.classList.add('active'); matched = true; } }
+                }
+              }catch(e){}
+            });
+            if (matched) return;
+          }
+
+          // priority 2: pathname
+          links.forEach(function(link){
+            try{
+              var href = link.getAttribute('href') || '';
+              var baseHref = href.split('#')[0];
+              var li = link.closest('.nav-item') || link.parentNode;
+              if (!li) return;
+              // skip pure-hash links (/#...) when matching by pathname — they are handled by hash logic
+              if (href.indexOf('#') !== -1 && baseHref === '/') return;
+              var nh = normalize(baseHref);
+              if (nh === current || (nh !== '/' && current.indexOf(nh) === 0) || (nh === '/index' && current === '/')){
+                li.classList.add('active'); matched = true;
+              }
+            }catch(e){}
+          });
+        } catch(e){ console.error('nav active set failed', e); }
+      }
+
+      // initial set and respond to hash changes
+      document.addEventListener('DOMContentLoaded', setHeaderActive);
+      window.addEventListener('hashchange', setHeaderActive);
+
+      // filters fallback (if page has .filters_menu)
+      try{
+        var items = document.querySelectorAll('.grid .all');
+        if(items && items.length>0){
+          function applyFilterSelector(sel){
+            if(!sel) return;
+            if(sel === '*' || sel === '.*'){
+                items.forEach(function(it){ if(it.classList) it.classList.remove('hidden'); });
+                return;
+              }
+              var cls = sel.replace(/^\./, '');
+              items.forEach(function(it){ if(it.classList && it.classList.contains(cls)) it.classList.remove('hidden'); else if(it.classList) it.classList.add('hidden'); });
+          }
+
+          // bind clicks
+          document.querySelectorAll('.filters_menu a').forEach(function(a){ a.addEventListener('click', function(e){ try{ e.preventDefault(); }catch(_){} }); });
+          document.querySelectorAll('.filters_menu li').forEach(function(li){ li.addEventListener('click', function(){ document.querySelectorAll('.filters_menu li').forEach(function(x){ x.classList.remove('active'); }); li.classList.add('active'); var d = li.getAttribute('data-filter')||'*'; try{ if(window.$grid && typeof window.$grid.isotope==='function'){ window.$grid.isotope({filter:d}); return;} }catch(e){} applyFilterSelector(d); }); });
+
+          // initial from hash or ?filter
+          var h = window.location.hash.replace('#','');
+          if(h){ var sel = h.charAt(0)==='.'?h:'.'+h; applyFilterSelector(sel); document.querySelectorAll('.filters_menu li').forEach(function(li){ if(li.getAttribute('data-filter')===sel) li.classList.add('active'); }); }
+          else { var params = new URLSearchParams(window.location.search); if(params.has('filter')){ var f = params.get('filter'); var sel = f.charAt(0)==='.'?f:'.'+f; applyFilterSelector(sel); document.querySelectorAll('.filters_menu li').forEach(function(li){ if(li.getAttribute('data-filter')===sel) li.classList.add('active'); }); } }
+        }
+      }catch(err){ console.error('filters init failed', err); }
     })();
   </script>
 

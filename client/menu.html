@@ -58,14 +58,14 @@
               <li class="nav-item">
                 <a class="nav-link" href="/index.html">Home </a>
               </li>
-              <li class="nav-item active">
-                <a class="nav-link" href="/menu.html">Menu <span class="sr-only">(current)</span> </a>
+              <li class="nav-item">
+                <a class="nav-link" href="/#menu">Menu</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/about.html">About</a>
+                <a class="nav-link" href="/#about">About</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/book.html">Book Table</a>
+                <a class="nav-link" href="/#book">Book Table</a>
               </li>
             </ul>
             <div class="user_option">
@@ -950,6 +950,42 @@
   <!-- owl slider -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js">
   </script>
+  <!-- Normalize pathname and set header nav active for static .html routes -->
+  <script>
+    (function(){
+      function normalize(p){
+        if(!p) return '/';
+        try{ p = p.toString(); }catch(e){}
+        try{ if (p.indexOf('http') === 0) p = new URL(p).pathname; } catch(e){}
+        p = p.split('?')[0].split('#')[0];
+        if (p.length > 1 && p.endsWith('/')) p = p.slice(0, -1);
+        p = p.replace(/\.html$/i, '');
+        return p || '/';
+      }
+
+      function setHeaderActive(){
+        try{
+          var current = normalize(window.location.pathname || '/');
+          var links = document.querySelectorAll('.navbar-nav .nav-link');
+          document.querySelectorAll('.navbar-nav .nav-item').forEach(function(li){ li.classList.remove('active'); });
+          var curHash = (window.location.hash || '').toLowerCase();
+          var matched = false;
+          if (curHash){
+            links.forEach(function(link){
+              try{ var href = link.getAttribute('href') || ''; if (href.indexOf('#') !== -1){ var linkHash = '#'+href.split('#')[1].toLowerCase(); if (linkHash === curHash){ var li = link.closest('.nav-item') || link.parentNode; if(li){ li.classList.add('active'); matched = true; } } } }catch(e){}
+            });
+            if (matched) return;
+          }
+          links.forEach(function(link){
+            try{ var href = link.getAttribute('href') || ''; var baseHref = href.split('#')[0]; var nh = normalize(baseHref); var li = link.closest('.nav-item') || link.parentNode; if (!li) return; if (nh === current || (nh !== '/' && current.indexOf(nh) === 0) || (nh === '/index' && current === '/')){ li.classList.add('active'); matched = true; } }catch(e){}
+          });
+        } catch(e) { console.error('nav active set failed', e); }
+      }
+
+      document.addEventListener('DOMContentLoaded', setHeaderActive);
+      window.addEventListener('hashchange', setHeaderActive);
+    })();
+  </script>
   <!-- isotope js -->
   <script src="https://unpkg.com/isotope-layout@3.0.4/dist/isotope.pkgd.min.js"></script>
   <!-- nice select -->
@@ -969,25 +1005,92 @@
 
   // isotope js
   $(window).on('load', function () {
-    $('.filters_menu li').click(function () {
+    // prevent anchor navigation inside the filters (some templates wrap labels with <a>)
+    $('.filters_menu').on('click', 'a', function (e) {
+      try { e.preventDefault(); } catch (err) {}
+    });
+
+    $('.filters_menu li').click(function (e) {
       $('.filters_menu li').removeClass('active');
       $(this).addClass('active');
 
       var data = $(this).attr('data-filter');
       if (window.$grid) {
-        window.$grid.isotope({
-          filter: data
-        });
+        // use isotope when available
+        window.$grid.isotope({ filter: data });
+      } else {
+        // fallback: toggle `hidden` class (more robust than inline display)
+        try {
+          if (data === '*') {
+            $('.grid .all').removeClass('hidden');
+          } else {
+            var cls = data.replace('.', '');
+            $('.grid .all').each(function() {
+              var $it = $(this);
+              if ($it.hasClass(cls)) $it.removeClass('hidden'); else $it.addClass('hidden');
+            });
+          }
+        } catch (err) {
+          console.error('Fallback filter failed', err);
+        }
       }
     });
 
     window.$grid = $(".grid").isotope({
       itemSelector: ".all",
       percentPosition: false,
-      masonry: {
-        columnWidth: ".all"
+      masonry: { columnWidth: ".all" }
+    });
+
+    // Apply filter from URL hash (#burger) or ?filter=burger on first load
+    try {
+      var applied = false;
+      var applyFilterBySelector = function(sel) {
+        if (!sel) return;
+        $('.filters_menu li').removeClass('active');
+        var li = $('.filters_menu li[data-filter="' + sel + '"]');
+        if (li.length === 0 && sel.charAt(0) !== '.') {
+          li = $('.filters_menu li[data-filter=".' + sel + '"]');
+        }
+        if (li.length) li.addClass('active');
+        if (window.$grid) {
+          window.$grid.isotope({ filter: sel });
+        } else {
+          if (sel === '*' || sel === '.*') {
+            $('.grid .all').removeClass('hidden');
+          } else {
+            var cls = sel.replace('.', '');
+            $('.grid .all').each(function() {
+              var $it = $(this);
+              if ($it.hasClass(cls)) $it.removeClass('hidden'); else $it.addClass('hidden');
+            });
+          }
+        }
+        applied = true;
+      };
+
+      var hash = window.location.hash;
+      if (hash) {
+        var key = hash.replace('#', '');
+        if (key) {
+          var sel = key.charAt(0) === '.' ? key : '.' + key;
+          applyFilterBySelector(sel);
+        }
       }
-    })
+
+      if (!applied) {
+        var params = new URLSearchParams(window.location.search);
+        if (params.has('filter')) {
+          var f = params.get('filter');
+          if (f) {
+            var sel = f.charAt(0) === '.' ? f : '.' + f;
+            applyFilterBySelector(sel);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('initial filter by URL failed', err);
+    }
   });
 
   // nice select
@@ -1033,6 +1136,130 @@
     }
   });
     </script>
+    <script>
+      (function(){
+        if (window.jQuery) return; // jQuery available -> existing handlers will run
+        try {
+          var filters = document.querySelectorAll('.filters_menu li');
+          var items = document.querySelectorAll('.grid .all');
+          if (!filters || !filters.length || !items) return;
+
+          function applyFilter(sel){
+            if (!sel) return;
+            if (sel === '*' || sel === '.*'){
+              items.forEach(function(it){ it.style.display = ''; });
+              return;
+            }
+            var cls = String(sel).replace(/^\./, '');
+            items.forEach(function(it){ if (it.classList && it.classList.contains(cls)) it.style.display = ''; else it.style.display = 'none'; });
+          }
+
+          filters.forEach(function(li){
+            li.addEventListener('click', function(e){
+              try{ if (e && e.preventDefault) e.preventDefault(); }catch(_){}
+              filters.forEach(function(x){ x.classList.remove('active'); });
+              li.classList.add('active');
+              var data = li.getAttribute('data-filter') || '*';
+              applyFilter(data);
+            });
+          });
+
+          // initial from hash or ?filter
+          var applied = false;
+          if (window.location.hash){
+            var key = window.location.hash.replace('#','');
+            if (key){ var sel = key.charAt(0)==='.'?key:'.'+key; applyFilter(sel); filters.forEach(function(li){ if(li.getAttribute('data-filter')===sel) li.classList.add('active'); }); applied = true; }
+          }
+          if (!applied){
+            try{ var params = new URLSearchParams(window.location.search); if(params.has('filter')){ var f = params.get('filter'); var sel = f.charAt(0)==='.'?f:'.'+f; applyFilter(sel); filters.forEach(function(li){ if(li.getAttribute('data-filter')===sel) li.classList.add('active'); }); } }catch(e){}
+          }
+
+          console.log('DEBUG: menu filter fallback applied (no jQuery)');
+        } catch (err){ console.error('menu fallback failed', err); }
+      })();
+    </script>
+
+    <!-- Robust unified filter handler (Isotope + DOM fallback) -->
+    <script>
+    (function(){
+      function log(){ try{ console.log.apply(console, arguments); }catch(e){} }
+
+      function initIsotopeIfNeeded(){
+        try{
+          if (window.Isotope && window.jQuery && !window.$grid){
+            try{
+              window.$grid = window.jQuery('.grid').isotope({
+                itemSelector: '.all',
+                percentPosition: false,
+                masonry: { columnWidth: '.all' }
+              });
+              log('DEBUG: isotope initialized (unified handler)');
+            }catch(e){ log('DEBUG: isotope init error', e); window.$grid = null; }
+          }
+        }catch(e){ log('DEBUG: isotope init failed', e); }
+      }
+
+      function applyFilter(sel){
+        if(!sel) return;
+        log('DEBUG: applyFilter', sel);
+        // try isotope first
+        try{
+          if (window.$grid && typeof window.$grid.isotope === 'function'){
+            window.$grid.isotope({ filter: sel });
+            return;
+          }
+        }catch(e){ log('DEBUG: isotope filter failed', e); }
+
+        // DOM fallback
+        try{
+          var items = document.querySelectorAll('.grid .all');
+          if(!items || items.length === 0) return;
+          if (sel === '*' || sel === '.*'){
+            items.forEach(function(it){ if(it.classList) it.classList.remove('hidden'); });
+            return;
+          }
+          var cls = String(sel).replace(/^\./, '');
+          items.forEach(function(it){ if (it.classList && it.classList.contains(cls)) it.classList.remove('hidden'); else if(it.classList) it.classList.add('hidden'); });
+        }catch(e){ log('DEBUG: DOM fallback failed', e); }
+      }
+
+      function bindFilters(){
+        try{
+          var menu = document.querySelector('.filters_menu');
+          if(!menu) return;
+          menu.addEventListener('click', function(e){
+            try{
+              var li = e.target.closest('li');
+              if(!li) return;
+              e.preventDefault && e.preventDefault();
+              // toggle active class
+              Array.prototype.forEach.call(menu.querySelectorAll('li'), function(x){ x.classList.remove('active'); });
+              li.classList.add('active');
+              var sel = li.getAttribute('data-filter') || '*';
+              applyFilter(sel);
+            }catch(err){ log('DEBUG: filter click handler error', err); }
+          }, false);
+        }catch(e){ log('DEBUG: bindFilters failed', e); }
+      }
+
+      function applyInitial(){
+        try{
+          var applied = false;
+          var h = (window.location.hash || '').replace('#','');
+          if(h){ var sel = h.charAt(0)==='.'? h : '.'+h; applyFilter(sel); var li = document.querySelector('.filters_menu li[data-filter="'+sel+'"]'); if(li) li.classList.add('active'); applied = true; }
+          if(!applied){ try{ var params = new URLSearchParams(window.location.search); if(params.has('filter')){ var f = params.get('filter')||''; var sel = f.charAt(0)==='.'? f : '.'+f; applyFilter(sel); var li = document.querySelector('.filters_menu li[data-filter="'+sel+'"]'); if(li) li.classList.add('active'); applied = true; } }catch(e){}
+        }catch(e){ log('DEBUG: applyInitial failed', e); }
+      }
+
+      function init(){
+        initIsotopeIfNeeded();
+        bindFilters();
+        applyInitial();
+      }
+
+      if (document.readyState === 'complete') init(); else window.addEventListener('load', init);
+    })();
+    </script>
   <!-- Google Map -->
   <script>
     (function loadGoogleMaps(){
@@ -1056,6 +1283,17 @@
       function log(...args){ try{ console.log.apply(console, args); }catch(e){} }
       document.addEventListener('DOMContentLoaded', function(){
         log('DEBUG: nav diagnostics active');
+        // runtime diagnostics: presence of jQuery/Isotope and filter items
+        try {
+          log('DEBUG: jQuery present', !!window.jQuery, typeof window.jQuery);
+          log('DEBUG: Isotope present', !!window.Isotope, !!window.$grid, typeof window.Isotope);
+          var filters = document.querySelectorAll('.filters_menu li') || [];
+          log('DEBUG: filters count', filters.length);
+          filters.forEach(function(li, idx){
+            try { log('DEBUG: filter', idx, li.textContent.trim(), li.getAttribute('data-filter')); } catch(e){}
+          });
+          log('DEBUG: current pathname', window.location.pathname, 'hash', window.location.hash, 'search', window.location.search);
+        } catch(e){ log('DEBUG: diagnostics failed', e); }
         var navs = document.querySelectorAll('.nav-link');
         navs.forEach(function(a,i){
           a.addEventListener('click', function(e){
@@ -1063,6 +1301,45 @@
             setTimeout(function(){ log('NAV CLICK after handlers defaultPrevented=', e.defaultPrevented); }, 0);
           }, true);
         });
+
+        // try to auto-set the header nav `active` state using a normalized pathname
+        try {
+          var normalizePath = function(p){
+            if (!p) return '/';
+            try { var u = new URL(p, window.location.origin); p = u.pathname; } catch(e) { /* ignore */ }
+            if (p.length > 1 && p.endsWith('/')) p = p.slice(0, -1);
+            p = p.replace(/\.html$/i, '');
+            return p || '/';
+          };
+
+          var current = normalizePath(window.location.pathname || '/');
+          var navItems = document.querySelectorAll('.navbar-nav .nav-item');
+          navItems.forEach(function(li){ li.classList.remove('active'); });
+
+          var curHash = (window.location.hash || '').toLowerCase();
+          navs.forEach(function(a){
+            try{
+              var href = a.getAttribute('href') || '';
+              var baseHref = href.split('#')[0];
+              var nh = normalizePath(baseHref);
+              var li = a.closest('.nav-item') || a.parentNode;
+              if (!li) return;
+              // prefer hash match first
+              if (curHash){
+                if (href.indexOf('#') !== -1){
+                  var linkHash = '#'+href.split('#')[1].toLowerCase();
+                  if (linkHash === curHash){ li.classList.add('active'); return; }
+                }
+              }
+              // then pathname (exact or sensible prefix), avoid matching root too broadly
+              if (href.indexOf('#') !== -1 && baseHref === '/') {
+                // skip anchor-only links when matching by pathname
+              } else if (nh === current || (nh !== '/' && current.indexOf(nh) === 0) || (nh === '/index' && current === '/')){
+                li.classList.add('active');
+              }
+            }catch(err){}
+          });
+        } catch(err){ log('nav active set failed', err); }
 
         document.addEventListener('click', function(e){
           try{
