@@ -1393,6 +1393,63 @@ getYear();
     })();
   </script>
 
+  <!-- Normalize nav + filter fallback (robust for production static builds) -->
+  <script>
+    (function(){
+      function normalize(p){
+        if(!p) return '/';
+        try{ p = p.toString(); }catch(e){}
+        try{ if (p.indexOf('http') === 0) p = new URL(p).pathname; } catch(e){}
+        p = p.split('?')[0].split('#')[0];
+        if (p.length > 1 && p.endsWith('/')) p = p.slice(0, -1);
+        p = p.replace(/\.html$/i, '');
+        return p || '/';
+      }
+
+      try{
+        // header active normalization
+        var current = normalize(window.location.pathname || '/');
+        document.querySelectorAll('.navbar-nav .nav-item').forEach(function(li){ li.classList.remove('active'); });
+        document.querySelectorAll('.nav-link').forEach(function(link){
+          try{
+            var href = link.getAttribute('href') || '';
+            var nh = normalize(href);
+            var li = link.closest('.nav-item') || link.parentNode;
+            if (!li) return;
+            if (nh === current || (nh !== '/' && current.indexOf(nh) === 0) ) {
+              li.classList.add('active');
+            }
+          }catch(e){}
+        });
+      } catch(e){ console.error('nav active set failed', e); }
+
+      // filters fallback (if page has .filters_menu)
+      try{
+        var items = document.querySelectorAll('.grid .all');
+        if(items && items.length>0){
+          function applyFilterSelector(sel){
+            if(!sel) return;
+            if(sel === '*' || sel === '.*'){
+              items.forEach(function(it){ it.style.display = ''; });
+              return;
+            }
+            var cls = sel.replace(/^\./, '');
+            items.forEach(function(it){ if(it.classList && it.classList.contains(cls)) it.style.display = ''; else it.style.display = 'none'; });
+          }
+
+          // bind clicks
+          document.querySelectorAll('.filters_menu a').forEach(function(a){ a.addEventListener('click', function(e){ try{ e.preventDefault(); }catch(_){} }); });
+          document.querySelectorAll('.filters_menu li').forEach(function(li){ li.addEventListener('click', function(){ document.querySelectorAll('.filters_menu li').forEach(function(x){ x.classList.remove('active'); }); li.classList.add('active'); var d = li.getAttribute('data-filter')||'*'; try{ if(window.$grid && typeof window.$grid.isotope==='function'){ window.$grid.isotope({filter:d}); return;} }catch(e){} applyFilterSelector(d); }); });
+
+          // initial from hash or ?filter
+          var h = window.location.hash.replace('#','');
+          if(h){ var sel = h.charAt(0)==='.'?h:'.'+h; applyFilterSelector(sel); document.querySelectorAll('.filters_menu li').forEach(function(li){ if(li.getAttribute('data-filter')===sel) li.classList.add('active'); }); }
+          else { var params = new URLSearchParams(window.location.search); if(params.has('filter')){ var f = params.get('filter'); var sel = f.charAt(0)==='.'?f:'.'+f; applyFilterSelector(sel); document.querySelectorAll('.filters_menu li').forEach(function(li){ if(li.getAttribute('data-filter')===sel) li.classList.add('active'); }); } }
+        }
+      }catch(err){ console.error('filters init failed', err); }
+    })();
+  </script>
+
 </body>
 
 </html>
