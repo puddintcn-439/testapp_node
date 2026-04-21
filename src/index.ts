@@ -14,7 +14,9 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   : ["http://localhost:5173"];
 app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "..", "client")));
+// Serve built client files from the project root so the path works
+// both locally and inside Vercel serverless function bundles.
+app.use(express.static(path.join(process.cwd(), "client")));
 
 app.use("/api/users", userRoutes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
