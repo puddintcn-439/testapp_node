@@ -96,3 +96,13 @@ If you want, I can:
 - consolidate the backend into a single folder now, or
 - add a CI build step to the prod-structure workflow, or
 - add an automated backup-tag workflow (tags `backup/<sha>` before merges) — tell me which and I'll implement it.
+
+**Environment variables for authentication**
+
+- `JWT_SECRET`: secret used to sign JWT tokens. Default for local/dev is `dev-secret`. Set a strong secret in production, e.g. via Vercel/Render environment settings.
+
+Example (bash):
+
+```bash
+export JWT_SECRET="your-very-strong-secret"
+```

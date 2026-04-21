@@ -1,7 +1,11 @@
 import { Router } from "express";
 import * as userController from "../controllers/userController";
+import authMiddleware from "../middleware/authMiddleware";
 
 const router = Router();
+
+// Protect all user routes - requires a valid JWT in Authorization header
+router.use(authMiddleware);
 
 /**
  * @swagger
