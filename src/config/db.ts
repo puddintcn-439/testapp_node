@@ -25,17 +25,35 @@ export async function initDb() {
       },
     };
     mssqlPool = await new mssql.ConnectionPool(config).connect();
-    const createSql = `IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='users' AND xtype='U')
-      CREATE TABLE users (id INT IDENTITY(1,1) PRIMARY KEY, name NVARCHAR(255) NOT NULL, email NVARCHAR(255) NOT NULL)`;
+    const createSql = `
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='users' AND xtype='U')
+  CREATE TABLE users (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    name NVARCHAR(255) NOT NULL,
+    email NVARCHAR(255) NOT NULL,
+    password_hash NVARCHAR(255) NULL,
+    created_at DATETIME2 NULL
+  );
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AND name = 'password_hash')
+  ALTER TABLE users ADD password_hash NVARCHAR(255) NULL;
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AND name = 'created_at')
+  ALTER TABLE users ADD created_at DATETIME2 NULL;
+`;
     await mssqlPool.request().batch(createSql);
   } else {
     const connStr =
       process.env.DATABASE_URL ||
       "postgresql://postgres:postgres@localhost:5432/testapp_node";
     pgPool = new PgPool({ connectionString: connStr });
-    await pgPool.query(
-      `CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name TEXT NOT NULL, email TEXT NOT NULL)`
-    );
+    await pgPool.query(`
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL
+);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
+`);
   }
 }
 

@@ -13,20 +13,35 @@ export async function getUserById(id: number): Promise<User | null> {
   return rows.length > 0 ? rows[0] : null;
 }
 
-export async function createUser(name: string, email: string): Promise<User> {
+// createUser accepts an optional passwordHash. If provided, it will be stored
+// in the password_hash column. Existing callers that pass only (name,email)
+// remain compatible.
+export async function createUser(
+  name: string,
+  email: string,
+  passwordHash: string | null = null
+): Promise<User> {
   if (DB_TYPE === "mssql") {
     const rows = await dbQuery(
-      "INSERT INTO users(name,email) OUTPUT inserted.id, inserted.name, inserted.email VALUES ($1,$2)",
-      [name, email]
+      "INSERT INTO users(name,email,password_hash) OUTPUT inserted.id, inserted.name, inserted.email VALUES ($1,$2,$3)",
+      [name, email, passwordHash]
     );
     return rows[0];
   } else {
     const rows = await dbQuery(
-      "INSERT INTO users(name,email) VALUES($1,$2) RETURNING id, name, email",
-      [name, email]
+      "INSERT INTO users(name,email,password_hash) VALUES($1,$2,$3) RETURNING id, name, email",
+      [name, email, passwordHash]
     );
     return rows[0];
   }
+}
+
+export async function getUserByEmail(email: string): Promise<(User & { password_hash?: string | null }) | null> {
+  const rows = await dbQuery(
+    "SELECT id, name, email, password_hash, created_at FROM users WHERE email = $1",
+    [email]
+  );
+  return rows.length > 0 ? rows[0] : null;
 }
 
 export async function updateUser(

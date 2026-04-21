@@ -6,6 +6,7 @@ import swaggerUi from "swagger-ui-express";
 import { initDb } from "./config/db";
 import { swaggerSpec } from "./config/swagger";
 import userRoutes from "./routes/userRoutes";
+import authRoutes from "./routes/authRoutes";
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use(express.static(path.join(process.cwd(), "client")));
 
 app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 export { app, initDb };
