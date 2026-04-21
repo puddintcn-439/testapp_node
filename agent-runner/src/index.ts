@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
+dotenv.config();
 import crypto from 'crypto';
 import { loadAgentManifests } from './manifestLoader';
 import { agentHandlers } from './agents';

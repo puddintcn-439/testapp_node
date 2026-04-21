@@ -3,7 +3,9 @@ import path from 'path';
 import yaml from 'js-yaml';
 
 export function loadAgentManifests() {
-  const AGENTS_DIR = path.join(process.cwd(), '.github', 'agents');
+  // cwd is agent-runner/ when running locally, go up one level to find .github/agents
+  const root = path.resolve(process.cwd(), fs.existsSync(path.join(process.cwd(), '.github')) ? '.' : '..');
+  const AGENTS_DIR = path.join(root, '.github', 'agents');
   if (!fs.existsSync(AGENTS_DIR)) return [];
   const files = fs.readdirSync(AGENTS_DIR).filter(f => f.endsWith('.agent.md') || f.endsWith('.md'));
   const manifests: any[] = [];
