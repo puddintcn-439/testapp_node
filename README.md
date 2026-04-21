@@ -47,7 +47,7 @@ TestApp/
 │  ├─ src/              # React app (Vite)
 │  ├─ dist/             # build output (generated)
 │  ├─ api/              # Vercel function files (serverless entry)
-│  └─ server/           # Express app adapted for serverless (imported by client/api)
+│  └─ (removed duplicate server/)  # backend consolidated in `src/`
 ├─ dist/                # backend build output (compiled JS)
 ├─ scripts/
 ├─ src/                 # backend source for local dev (Express + TypeScript)
@@ -71,8 +71,7 @@ TestApp/
 	- `client/src/`: Vite + React source files for the frontend SPA/MPA.
 	- `client/dist/`: Generated production build (do not commit; add to `.gitignore`).
 	- `client/vercel.json`: Vercel routing and functions configuration used when Vercel builds from `client/`.
-	- `client/api/index.ts`: Serverless function entry that imports the Express app from `client/server` and adapts it for Vercel.
-	- `client/server/`: A copy of the Express backend adapted for serverless execution (contains `index.ts`, `config/`, `routes/`, `controllers/`, `services/`). This is used only by Vercel functions in the current layout.
+	- `client/api/index.ts`: Serverless function entry that imports the Express app from the canonical backend at `src/index.ts` and adapts it for Vercel.
 
 - `src/` — Backend server source used for local development.
 	- `src/index.ts`: Local server entry. Starts an HTTP server when not running on Vercel.
@@ -87,8 +86,8 @@ TestApp/
 
 ## Notes & recommendations
 
-- Currently the backend code is duplicated: `src/` (local dev) and `client/server/` (for Vercel). This works but increases maintenance burden and risk of drift. Recommended actions:
-	1. Consolidate the backend into a single source-of-truth (e.g., `backend/` or keep `src/`) and update Vercel config to use the same code (change Vercel project root or move a small adapter into `client/`).
+Currently the backend code has been consolidated into a single source-of-truth: `src/` (used for local dev and by serverless functions).
+	1. Keep `src/` as the canonical backend and ensure Vercel functions (in `client/api`) import from `src/` or adjust the Vercel root so the deploy process includes `src/`.
 	2. Add a CI step to run `npm --prefix client run build` so the repository validates frontend artifacts before deployment.
 
 - Avoid using `path.join(__dirname, '..', '...')` to reach project files from within serverless functions; prefer `process.cwd()` or use `includeFiles` in `vercel.json`.

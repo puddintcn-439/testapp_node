@@ -1,4 +1,4 @@
-import { app, initDb } from "../server/index";
+import { app, initDb } from "../../src/index";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import type { IncomingMessage, ServerResponse } from "http";
 
