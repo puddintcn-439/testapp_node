@@ -21,7 +21,8 @@ export async function generatePatchFromPrompt(prompt: string) {
         'Content-Type': 'application/json'
       }
     });
-    const text = resp.data?.choices?.[0]?.message?.content || resp.data?.choices?.[0]?.text || '';
+    const d: any = resp.data;
+    const text = d?.choices?.[0]?.message?.content || d?.choices?.[0]?.text || '';
     try {
       return JSON.parse(text);
     } catch (err) {
