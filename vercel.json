@@ -3,7 +3,7 @@
     { "source": "/(.*)", "destination": "/api" }
   ],
   "functions": {
-    "api/index.ts": {
+    "api/**/*.ts": {
       "includeFiles": "client/**"
     }
   }
