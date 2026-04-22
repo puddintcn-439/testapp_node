@@ -1,0 +1,6 @@
+"name","email","password_hash","created_at"
+"Alice Nguyen","alice@example.com","$2a$10$sM9El/fv3N8H689OPuai.ewn7jpS8f0f6xhzs9t6WDkyzYD7v7ZO.","2026-04-22T06:11:36.436Z"
+"Bob Tran","bob@example.com","$2a$10$qMA4LDmHCdPRIhSepkfnCO8OgAzF609UiXJdEuazCgddr7knrW1ba","2026-04-22T06:11:36.498Z"
+"Carol Le","carol@example.com","$2a$10$7HhwKjzdTuZnWBqrdjZNPecF8bx0eyQmXfImTJrVu8XfyCnaNlRaC","2026-04-22T06:11:36.558Z"
+"David Pham","david@example.com","$2a$10$ABe/Kl9qqSYD4jFcGRaLnO/IO9rwv8IDF8kJPtXtxxBXikLT8vekK","2026-04-22T06:11:36.619Z"
+"Eve Hoang","eve@example.com","$2a$10$CPQIvdpJGL.O.Mio7dxCqeJnnqVw6c.y/YDWdDzQ/yGuOvEE7gkg.","2026-04-22T06:11:36.683Z"
