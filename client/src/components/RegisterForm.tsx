@@ -25,12 +25,28 @@ export default function RegisterForm({ onRegistered }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="auth-form">
-      {error && <div className="error">{error}</div>}
-      <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" required />
-      <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
-      <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" type="password" required />
-      <button className="btn btn-primary" type="submit">Register</button>
+    <form onSubmit={handleSubmit}>
+      {error && <div className="alert alert-danger">{error}</div>}
+
+      <div className="form-group">
+        <label htmlFor="reg-name">Name</label>
+        <input id="reg-name" className="form-control" value={name} onChange={(e) => setName(e.target.value)} placeholder="Full name" required />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="reg-email">Email</label>
+        <input id="reg-email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="reg-password">Password</label>
+        <input id="reg-password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" type="password" required />
+      </div>
+
+      <div className="d-flex">
+        <button className="btn btn-primary" type="submit">Register</button>
+        <a href="/login.html" className="btn btn-link ml-3">Login</a>
+      </div>
     </form>
   );
 }

@@ -97,19 +97,21 @@ export default function App() {
         />
 
         {showAuth && (
-          <div style={{position:'fixed', inset:0, background:'rgba(0,0,0,0.4)', display:'flex', alignItems:'center', justifyContent:'center'}}>
-            <div style={{background:'#fff', padding:20, borderRadius:6, minWidth:320}}>
-              <div style={{display:'flex', gap:8, marginBottom:12}}>
-                <button className={authMode === 'login' ? 'btn btn-primary' : 'btn btn-ghost'} onClick={() => setAuthMode('login')}>Login</button>
-                <button className={authMode === 'register' ? 'btn btn-primary' : 'btn btn-ghost'} onClick={() => setAuthMode('register')}>Register</button>
-              </div>
-              {authMode === 'login' ? (
-                <LoginForm onSuccess={handleAuthSuccess} />
-              ) : (
-                <RegisterForm onRegistered={handleAuthSuccess} />
-              )}
-              <div style={{textAlign:'right', marginTop:12}}>
-                <button className="btn btn-ghost" onClick={() => setShowAuth(false)}>Close</button>
+          <div style={{position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000}}>
+            <div className="card shadow-lg" style={{minWidth:320, maxWidth:560}}>
+              <div className="card-body">
+                <div style={{display:'flex', gap:8, marginBottom:12}}>
+                  <button className={authMode === 'login' ? 'btn btn-primary' : 'btn btn-ghost'} onClick={() => setAuthMode('login')}>Login</button>
+                  <button className={authMode === 'register' ? 'btn btn-primary' : 'btn btn-ghost'} onClick={() => setAuthMode('register')}>Register</button>
+                </div>
+                {authMode === 'login' ? (
+                  <LoginForm onSuccess={handleAuthSuccess} />
+                ) : (
+                  <RegisterForm onRegistered={handleAuthSuccess} />
+                )}
+                <div className="text-right mt-3">
+                  <button className="btn btn-ghost" onClick={() => setShowAuth(false)}>Close</button>
+                </div>
               </div>
             </div>
           </div>

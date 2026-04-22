@@ -24,11 +24,23 @@ export default function LoginForm({ onSuccess }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="auth-form">
-      {error && <div className="error">{error}</div>}
-      <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
-      <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" type="password" required />
-      <button className="btn btn-primary" type="submit">Login</button>
+    <form onSubmit={handleSubmit} className="">
+      {error && <div className="alert alert-danger">{error}</div>}
+
+      <div className="form-group">
+        <label htmlFor="login-email">Email</label>
+        <input id="login-email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" type="email" required />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="login-password">Password</label>
+        <input id="login-password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" type="password" required />
+      </div>
+
+      <div className="d-flex justify-content-between align-items-center">
+        <button className="btn btn-primary" type="submit">Login</button>
+        <a className="btn btn-link" href="#">Forgot?</a>
+      </div>
     </form>
   );
 }
