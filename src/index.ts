@@ -1,7 +1,6 @@
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
-import path from "path";
 import swaggerUi from "swagger-ui-express";
 import { initDb } from "./config/db";
 import { swaggerSpec } from "./config/swagger";
@@ -15,9 +14,6 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   : ["http://localhost:5173", "https://testapp-node.vercel.app"];
 app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
-// Serve built client files from the project root so the path works
-// both locally and inside Vercel serverless function bundles.
-app.use(express.static(path.join(process.cwd(), "client")));
 
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
