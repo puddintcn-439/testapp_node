@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A basic Node.js app with TypeScript",
   "engines": {
-    "node": "16.x"
+    "node": "24.x"
   },
   "main": "dist/index.js",
   "scripts": {
