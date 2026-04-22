@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>Login</title>
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+  <link href="css/style.css" rel="stylesheet" />
+</head>
+
+<body>
+  <header class="header_section">
+    <div class="container">
+      <nav class="navbar navbar-expand-lg custom_nav-container">
+        <a class="navbar-brand" href="index.html"><span>Feane</span></a>
+        <div class="user_option">
+          <a href="/login.html" class="user_link"><i class="fa fa-user" aria-hidden="true"></i></a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" style="padding:40px;">
+    <h2>Login</h2>
+    <form id="loginForm" style="max-width:420px;">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" class="form-control" type="email" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" class="form-control" type="password" required />
+      </div>
+      <div style="margin-top:12px;">
+        <button type="submit" class="btn btn-primary">Login</button>
+        <a href="/" class="btn btn-ghost" style="margin-left:8px;">Cancel</a>
+      </div>
+      <div id="msg" style="margin-top:12px;color:#b00"></div>
+    </form>
+  </main>
+
+  <script>
+    (function(){
+      const form = document.getElementById('loginForm');
+      const msg = document.getElementById('msg');
+      form.addEventListener('submit', async function(e){
+        e.preventDefault();
+        msg.textContent = '';
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+          if (!res.ok) {
+            const j = await res.json().catch(()=>null);
+            msg.textContent = j?.message || 'Login failed';
+            return;
+          }
+          const data = await res.json();
+          if (data?.token) {
+            try { localStorage.setItem('token', data.token); } catch (err) {}
+            msg.style.color = '#080';
+            msg.textContent = 'Login successful — redirecting...';
+            setTimeout(()=> window.location.href = '/', 700);
+          } else {
+            msg.textContent = 'Login succeeded but no token received';
+          }
+        } catch (err) {
+          msg.textContent = 'Network error or server unavailable';
+        }
+      });
+    })();
+  </script>
+</body>
+
+</html>
