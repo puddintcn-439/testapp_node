@@ -12,7 +12,7 @@ const app = express();
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",")
-  : ["http://localhost:5173"];
+  : ["http://localhost:5173", "https://testapp-node.vercel.app"];
 app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 // Serve built client files from the project root so the path works
