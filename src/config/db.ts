@@ -44,7 +44,12 @@ IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AN
     const connStr =
       process.env.DATABASE_URL ||
       "postgresql://postgres:postgres@localhost:5432/testapp_node";
-    pgPool = new PgPool({ connectionString: connStr });
+    pgPool = new PgPool({
+      connectionString: connStr,
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    });
     await pgPool.query(`
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
