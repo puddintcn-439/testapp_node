@@ -3,11 +3,14 @@ import * as mssql from "mssql";
 
 export const DB_TYPE = (process.env.DB_TYPE || "pg").toLowerCase();
 
-export let pgPool: PgPool | null = null;
-export let mssqlPool: mssql.ConnectionPool | null = null;
+// Use global caching to avoid reinitializing DB pools across serverless invocations
+const g: any = globalThis as any;
+export let pgPool: PgPool | null = g.__pgPool ?? null;
+export let mssqlPool: mssql.ConnectionPool | null = g.__mssqlPool ?? null;
 
 export async function initDb() {
   if (DB_TYPE === "mssql") {
+    if (mssqlPool) return;
     const conn =
       process.env.DATABASE_URL ||
       process.env.MSSQL_CONNECTION ||
@@ -25,6 +28,7 @@ export async function initDb() {
       },
     };
     mssqlPool = await new mssql.ConnectionPool(config).connect();
+    g.__mssqlPool = mssqlPool;
     const createSql = `
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='users' AND xtype='U')
   CREATE TABLE users (
@@ -41,10 +45,12 @@ IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('users') AN
 `;
     await mssqlPool.request().batch(createSql);
   } else {
+    if (pgPool) return;
     const connStr =
       process.env.DATABASE_URL ||
       "postgresql://postgres:postgres@localhost:5432/testapp_node";
     pgPool = new PgPool({ connectionString: connStr });
+    g.__pgPool = pgPool;
     await pgPool.query(`
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
