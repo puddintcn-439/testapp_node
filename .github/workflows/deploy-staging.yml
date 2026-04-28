@@ -1,3 +1,44 @@
+name: Deploy Staging (build + smoke tests)
+
+on:
+  push:
+    branches: [staging]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run smoke tests
+        run: npm test -- --runInBand
+
+  # Optional deploy step: will only run if secrets are configured in repo
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: ${{ secrets.VERCEL_TOKEN != '' || secrets.RENDER_DEPLOY_HOOK != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to providers
+        run: |
+          if [ -n "${{ secrets.RENDER_DEPLOY_HOOK }}" ]; then
+            curl -s "${{ secrets.RENDER_DEPLOY_HOOK }}" || true
+          fi
+          if [ -n "${{ secrets.VERCEL_TOKEN }}" ]; then
+            npx --yes vercel@latest --prod --token="${{ secrets.VERCEL_TOKEN }}" --yes || true
+          fi
 name: Deploy Agent Runner to Staging
 
 on:

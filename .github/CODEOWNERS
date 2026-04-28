@@ -1,0 +1,7 @@
+# Default owners for the repository
+/* @puddintcn-439
+
+# Backend and infrastructure
+src/ @puddintcn-439
+scripts/ @puddintcn-439
+.github/workflows/ @puddintcn-439
