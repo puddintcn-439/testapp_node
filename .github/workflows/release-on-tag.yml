@@ -17,6 +17,8 @@ jobs:
           node-version: 20
 
       - name: Install deps
+        env:
+          HUSKY_SKIP_INSTALL: '1'
         run: npm ci
 
       - name: Build

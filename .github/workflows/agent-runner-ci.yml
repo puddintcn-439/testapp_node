@@ -18,10 +18,14 @@ jobs:
         with:
           node-version: 18
       - name: Install dependencies
+        env:
+          HUSKY_SKIP_INSTALL: '1'
         run: |
           cd agent-runner
           npm ci
       - name: Run tests
+        env:
+          HUSKY_SKIP_INSTALL: '1'
         run: |
           cd agent-runner
           npm ci

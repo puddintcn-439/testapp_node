@@ -18,6 +18,8 @@ jobs:
         with:
           node-version: 18
       - name: Install runner deps
+        env:
+          HUSKY_SKIP_INSTALL: '1'
         run: |
           cd agent-runner
           npm ci
