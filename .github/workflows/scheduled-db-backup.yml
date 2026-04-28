@@ -1,0 +1,33 @@
+name: Scheduled DB Backup
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # daily at 02:00 UTC
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pg client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client gzip
+
+      - name: Dump Postgres DB
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -e
+          TIMESTAMP=$(date +"%Y%m%d%H%M%S")
+          OUT=db_backup_${TIMESTAMP}.dump
+          pg_dump "$DATABASE_URL" -Fc -f "$OUT"
+          gzip -f "$OUT"
+          ls -lh
+
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup
+          path: db_backup_*.dump.gz
