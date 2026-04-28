@@ -14,7 +14,14 @@
     "dev:client": "npm run dev --prefix client",
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:client\"",
     "test": "jest",
-    "gen:map": "node scripts/generate_project_map.js"
+    "gen:map": "node scripts/generate_project_map.js",
+    "migrate": "ts-node scripts/migrate.ts up",
+    "migrate:down": "ts-node scripts/migrate.ts down",
+    "migrate:status": "ts-node scripts/migrate.ts status",
+    "lint": "eslint 'src/**/*.ts' --ext .ts,.tsx",
+    "format": "prettier --write .",
+    "prepare": "husky install",
+    "e2e": "npx playwright test"
   },
   "keywords": [],
   "author": "",
@@ -38,6 +45,14 @@
     "ts-jest": "^29.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.0"
+  ,
+    "eslint": "^8.50.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "prettier": "^2.8.8",
+    "husky": "^8.0.0",
+    "lint-staged": "^13.0.0",
+    "@playwright/test": "^1.35.0"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -49,5 +64,13 @@
     "pg": "^8.20.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
+  }
+
+  ,
+  "lint-staged": {
+    "src/**/*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }
