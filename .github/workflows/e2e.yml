@@ -33,6 +33,11 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
+      - name: Run migrations
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/testapp_node
+        run: npm run migrate
+
       - name: Build and start server
         run: |
           npm run build

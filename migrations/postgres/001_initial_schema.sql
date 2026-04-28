@@ -43,3 +43,12 @@ CREATE TABLE IF NOT EXISTS booking_items (
   quantity INT DEFAULT 1,
   price_at_order NUMERIC(10,2) NOT NULL
 );
+
+-- Seed a default table and menu item for e2e tests and quick local start
+INSERT INTO restaurant_tables (id, name, capacity, location, is_active)
+SELECT 1, 'Table 1', 4, 'Main floor', TRUE
+WHERE NOT EXISTS (SELECT 1 FROM restaurant_tables WHERE id = 1);
+
+INSERT INTO menu_items (id, name, description, price, is_available)
+SELECT 1, 'Burger', 'Classic burger', 5.99, TRUE
+WHERE NOT EXISTS (SELECT 1 FROM menu_items WHERE id = 1);

@@ -9,6 +9,7 @@ import userRoutes from './routes/userRoutes';
 import metricsRoutes from './routes/metricsRoutes';
 import authRoutes from './routes/authRoutes';
 import healthRoutes from './routes/healthRoutes';
+import bookingRoutes from './routes/bookingRoutes';
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/health', healthRoutes);
 app.use('/metrics', metricsRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 if (process.env.SENTRY_DSN) {
   Sentry.init({ dsn: process.env.SENTRY_DSN, environment: process.env.NODE_ENV || 'production' });

@@ -5,6 +5,8 @@ import UserForm from "./components/UserForm";
 import UserTable from "./components/UserTable";
 import LoginForm from "./components/LoginForm";
 import RegisterForm from "./components/RegisterForm";
+import BookingForm from "./components/BookingForm";
+import BookingList from "./components/BookingList";
 
 export default function App() {
   const [users, setUsers] = useState<User[]>([]);
@@ -118,6 +120,14 @@ export default function App() {
         )}
 
         <UserTable users={users} onEdit={setEditing} onDelete={handleDelete} />
+      </div>
+      <div style={{ height: 12 }} />
+      <div className="card">
+        <div className="card-body">
+          <h1 className="header">Bookings</h1>
+          <BookingForm onSaved={() => { /* triggers list refresh via internal logic */ }} />
+          <BookingList />
+        </div>
       </div>
     </div>
   );
