@@ -1,0 +1,30 @@
+name: E2E tests
+
+on:
+  pull_request:
+
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Build and start server
+        run: |
+          npm run build
+          nohup npm start &
+          sleep 3
+
+      - name: Run Playwright tests
+        run: npm run e2e
