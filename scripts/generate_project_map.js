@@ -52,36 +52,37 @@ async function main() {
 
   // client components
   for (const f of files) {
-    if (f.match(/client\\/src\\/components\\/.*\\.(tsx|jsx|ts|js)$/)) {
-      const name = path.basename(f).replace(/\\.(tsx|jsx|ts|js)$/, '');
+    const fn = f.replace(/\\\\/g, '/');
+    if (fn.includes('client/src/components/')) {
+      const name = path.basename(fn).replace(/\.(tsx|jsx|ts|js)$/, '');
       mapping.client.components[name] = rel(f);
     }
-    if (f.match(/client\\/src\\/api\\/.*\\.(ts|js)$/)) {
-      const name = path.basename(f).replace(/\\.(ts|js)$/, '');
+    if (fn.includes('client/src/api/')) {
+      const name = path.basename(fn).replace(/\.(ts|js)$/, '');
       mapping.client.api_wrappers[name] = rel(f);
     }
-    if (f.match(/src\\/routes\\/.*\\.ts$/)) {
-      const name = path.basename(f).replace(/\\.ts$/, '').replace(/Routes?$/i, '');
-      mapping.server.routes[name || path.basename(f)] = rel(f);
+    if (fn.includes('src/routes/') && fn.endsWith('.ts')) {
+      const name = path.basename(fn).replace(/\.ts$/, '').replace(/Routes?$/i, '');
+      mapping.server.routes[name || path.basename(fn)] = rel(f);
     }
-    if (f.match(/src\\/controllers\\/.*\\.ts$/)) {
-      const name = path.basename(f).replace(/\\.ts$/, '');
+    if (fn.includes('src/controllers/') && fn.endsWith('.ts')) {
+      const name = path.basename(fn).replace(/\.ts$/, '');
       mapping.server.controllers[name] = rel(f);
     }
-    if (f.match(/src\\/services\\/.*\\.ts$/)) {
-      const name = path.basename(f).replace(/\\.ts$/, '');
+    if (fn.includes('src/services/') && fn.endsWith('.ts')) {
+      const name = path.basename(fn).replace(/\.ts$/, '');
       mapping.server.services[name] = rel(f);
     }
-    if (f.match(/src\\/models\\/.*\\.ts$/)) {
-      const name = path.basename(f).replace(/\\.ts$/, '');
+    if (fn.includes('src/models/') && fn.endsWith('.ts')) {
+      const name = path.basename(fn).replace(/\.ts$/, '');
       mapping.server.models[name] = rel(f);
     }
-    if (f.match(/src\\/config\\/.*\\.ts$/)) {
-      const name = path.basename(f).replace(/\\.ts$/, '');
+    if (fn.includes('src/config/') && fn.endsWith('.ts')) {
+      const name = path.basename(fn).replace(/\.ts$/, '');
       mapping.server.config[name] = rel(f);
     }
-    if (f.match(/scripts\\/.*\\.(js|ts)$/)) {
-      const name = path.basename(f);
+    if (fn.includes('scripts/') && (fn.endsWith('.js') || fn.endsWith('.ts'))) {
+      const name = path.basename(fn);
       mapping.scripts[name] = rel(f);
     }
   }
