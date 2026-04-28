@@ -16,6 +16,7 @@ Danh mục các skill đã scaffold để hỗ trợ quá trình phát triển t
 - ci-cd — CI/CD pipeline và best-practices
 - release-deploy — Phát hành và deploy
 - monitoring-ops — Observability, logging và alerts
+ - agent-system — Master agent workflow for rapid context loading and safe edits
 
 # Cách dùng
 Gõ lệnh tìm kiếm trong chat agent với từ khoá trong phần `description`, ví dụ: "Use when: add/modify component" hoặc mở file tương ứng trong `.github/skills/<skill>/SKILL.md`.
