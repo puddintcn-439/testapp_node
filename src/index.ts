@@ -6,6 +6,7 @@ import * as Sentry from '@sentry/node';
 import { initDb } from './config/db';
 import { swaggerSpec } from './config/swagger';
 import userRoutes from './routes/userRoutes';
+import metricsRoutes from './routes/metricsRoutes';
 import authRoutes from './routes/authRoutes';
 import healthRoutes from './routes/healthRoutes';
 
@@ -21,10 +22,18 @@ app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/health', healthRoutes);
+app.use('/metrics', metricsRoutes);
 
 if (process.env.SENTRY_DSN) {
   Sentry.init({ dsn: process.env.SENTRY_DSN, environment: process.env.NODE_ENV || 'production' });
   app.use(Sentry.Handlers.requestHandler());
+}
+
+// Sentry error handler (if enabled) should be registered after routes
+if (process.env.SENTRY_DSN) {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const SentryReq = require('@sentry/node');
+  app.use(SentryReq.Handlers.errorHandler());
 }
 
 export { app, initDb };

@@ -20,6 +20,7 @@
     "migrate:status": "ts-node scripts/migrate.ts status",
     "lint": "eslint 'src/**/*.ts' --ext .ts,.tsx",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "prepare": "husky install",
     "e2e": "npx playwright test"
   },
@@ -28,6 +29,7 @@
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.35.0",
+    "prom-client": "^14.0.0",
     "@types/axios": "^0.9.36",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",

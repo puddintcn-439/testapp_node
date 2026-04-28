@@ -22,6 +22,12 @@ jobs:
       - name: Install dependencies (backend)
         run: npm ci
 
+      - name: Lint (backend)
+        run: npm run lint
+
+      - name: Prettier check
+        run: npm run format:check
+
       - name: Run tests (backend)
         run: npm test
 
