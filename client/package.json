@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react-dom": "^19.2.6",
     "testapp": "file:..",
     "cors": "^2.8.6",
     "dotenv": "^17.4.0",
